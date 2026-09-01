@@ -50,6 +50,10 @@ export default function Info() {
           <span className="mailto__text">{SITE.email}</span>
         </a>
 
+        <Link className="write-cta" to="/contact">
+          Or write to me here <span aria-hidden="true">&rarr;</span>
+        </Link>
+
         <div className="meta">
           <div className="meta__col">
             <span className="meta__k">Elsewhere</span>

@@ -36,6 +36,12 @@ which **you** have to create — I can't make accounts on your behalf.
    | Name | Value | Environments |
    | --- | --- | --- |
    | `RESEND_API_KEY` | the `re_...` key | Production, Preview, Development |
+   | `VITE_CONTACT_ENDPOINT` | `/api/contact` | Production, Preview |
+
+   Both are required. `RESEND_API_KEY` is read server-side by the function;
+   `VITE_CONTACT_ENDPOINT` is baked into the client at build time and tells the
+   form where to POST. Leave `VITE_CONTACT_ENDPOINT` unset locally — `vite dev`
+   does not run Vercel functions, so the form correctly falls back to mailto.
 
 4. Redeploy. The form is live.
 
