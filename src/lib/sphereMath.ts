@@ -19,35 +19,53 @@ export type TileLayoutOptions = {
    * Each tile owns 4π/N steradians. A tile's patch is ~4·w·h steradians, so
    * `fill = 1` would tile the sphere exactly *if* the cells were axis-aligned
    * rectangles of the photo's aspect. They are not — cells are near-hexagonal
-   * and photos come in thirteen different aspects — so some slack is needed
-   * before the gaps close up. Measured coverage on the real 162-photo manifest
-   * (400k sample directions, the same patch test the shader performs):
+   * and photos come in thirteen different aspects — so a rectangle can never
+   * sit flush in its cell. Whatever is left over has to go somewhere: either
+   * into white showing through, or into photographs lying across each other.
    *
-   *   fill 0.82 → 78% covered,  2% double-covered — far too sparse on screen,
-   *                             the surface reads as scattered cards, not a skin
-   *   fill 1.00 → 90% covered,  8% double-covered
-   *   fill 1.14 → 95% covered, 16% double-covered
-   *   fill 1.22 → 97% covered, 22% double-covered  ← default
-   *   fill 1.30 → 98% covered, 28% double-covered — gaps essentially closed,
-   *                             but the layering starts to read as a pile
+   * Overlap is the more expensive of the two. A photograph cut by its
+   * neighbour's edge reads as mess; a sliver of the ice-white page between two
+   * photographs reads as grout, and grout is what makes a mosaic look laid
+   * rather than piled. So this is deliberately tuned *below* the point where
+   * the gaps close. Measured on the real 162-photo manifest at the default
+   * tilt (250k sample directions, the same patch test the shader performs):
    *
-   * The remaining ~3.5% is the ice-white showing through as grout: at the
-   * default *no* sample direction on the sphere is further than 0.055 rad
-   * (about a fifth of a tile) from a photograph, so there are no blotches —
-   * only slivers and the odd small wedge where two tilts disagree.
+   *   fill 0.95 → 84% covered, 10% double-covered — airy, but a few cells go
+   *                            conspicuously empty and read as a missing photo
+   *   fill 1.05 → 89% covered, 15% double-covered  ← default
+   *   fill 1.12 → 91% covered, 19% double-covered
+   *   fill 1.22 → 94% covered, 25% double-covered — gaps nearly closed, and
+   *                            the surface goes back to reading as a pile
+   *
+   * The 11% that is not covered is grout, not holes: no sample direction on
+   * the sphere is further than 0.067 rad from a photograph — about a quarter
+   * of a tile — so the white arrives as joints between frames, never as a
+   * blotch, and the silhouette still reads as a clean circle.
    */
   fill: number
-  /** ±fraction of size variation per tile, from a seeded RNG. */
+  /**
+   * ±fraction of size variation per tile, from a seeded RNG.
+   *
+   * The photographs are already many different shapes; this is only there so
+   * that two neighbours of the same aspect are not identical twins. Kept
+   * gentle on purpose — at ±0.10 the joints between courses visibly widen and
+   * narrow, which is the same visual noise the tilt used to add.
+   */
   sizeJitter: number
   /**
-   * Maximum tile tilt away from the local horizon, radians.
+   * Maximum tile tilt away from the local horizon, radians. Off by default.
    *
-   * Tiles are nudged toward the direction in which their neighbours are
-   * furthest away, which lets a 3:2 photo lie along the roomy axis of its cell.
-   * This is the cheapest win in the whole layout — measured at fill 1.10, going
-   * from 0° to 16° of allowed tilt takes coverage from 90% to 94% *and* drops
-   * double-coverage from 17% to 13%. Past ~20° the numbers stop improving and
-   * the surface starts to read as thrown rather than laid, so it is clamped.
+   * Tiles can be nudged toward the direction in which their neighbours are
+   * furthest away, which lets a 3:2 photo lie along the roomy axis of its
+   * cell. Geometrically it is nearly free — at fill 1.05, allowing 6° of tilt
+   * moves coverage 88.5% → 90% and double-coverage 14.6% → 13%.
+   *
+   * It is still set to zero, because the numbers were measuring the wrong
+   * thing. Every tile getting its own angle is what made the surface read as
+   * confetti: a dozen competing horizons in one glance, with no two edges
+   * parallel. With the tilt off, tiles line up on the local horizon, the
+   * courses read as courses, and the object reads as a woven globe. The one
+   * or two percent of coverage that costs is bought back with `fill` instead.
    */
   maxTilt: number
   /** Neighbours consulted when estimating the roomy axis. 6 ≈ one hex ring. */
@@ -58,9 +76,9 @@ export type TileLayoutOptions = {
 
 /** The tunables. Change these to retune the surface. */
 export const TILE_LAYOUT_DEFAULTS: TileLayoutOptions = {
-  fill: 1.0,
-  sizeJitter: 0.05,
-  maxTilt: (0 * Math.PI) / 180,
+  fill: 1.05,
+  sizeJitter: 0.06,
+  maxTilt: 0,
   alignNeighbours: 6,
   seed: 1337,
 }
@@ -195,46 +213,58 @@ export function layoutTiles(
   const cellSolidAngle = (4 * Math.PI) / n
 
   // Nearest neighbours, brute force. n = 162, so this is ~26k dot products.
+  // The only thing they feed is the rotation nudge, so with the tilt off the
+  // whole search is skipped rather than computed and thrown away.
   const neighbourIdx: number[][] = []
-  for (let i = 0; i < n; i++) {
-    const ci = at(i)
-    const ranked: Array<[number, number]> = []
-    for (let j = 0; j < n; j++) {
-      if (i === j) continue
-      const cj = at(j)
-      const d = ci[0] * cj[0] + ci[1] * cj[1] + ci[2] * cj[2]
-      ranked.push([j, -d]) // larger dot = closer, so sort by -d ascending
+  if (maxTilt > 0) {
+    for (let i = 0; i < n; i++) {
+      const ci = at(i)
+      const ranked: Array<[number, number]> = []
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue
+        const cj = at(j)
+        const d = ci[0] * cj[0] + ci[1] * cj[1] + ci[2] * cj[2]
+        ranked.push([j, -d]) // larger dot = closer, so sort by -d ascending
+      }
+      ranked.sort((p, q) => p[1] - q[1])
+      neighbourIdx.push(ranked.slice(0, alignNeighbours).map(([j]) => j))
     }
-    ranked.sort((p, q) => p[1] - q[1])
-    neighbourIdx.push(ranked.slice(0, alignNeighbours).map(([j]) => j))
   }
 
   for (let i = 0; i < n; i++) {
     const c = at(i)
-    const { tangent, bitangent } = tangentBasis(c)
     const aspect = aspects[i] > 0 ? aspects[i] : 1
 
     // --- rotation -----------------------------------------------------------
-    // Neighbour directions are axes, not vectors (a neighbour at φ and one at
-    // φ+π constrain the same axis), so average them in doubled-angle space:
-    // Σ d²·(cos2φ, sin2φ). Half the resulting angle is the direction in which
-    // neighbours sit furthest away — the roomy axis of this tile's cell.
-    let sx = 0
-    let sy = 0
-    for (const j of neighbourIdx[i]) {
-      const { u, v, angle } = tangentOffset(c, tangent, bitangent, at(j))
-      const phi = Math.atan2(v, u)
-      const weight = angle * angle
-      sx += weight * Math.cos(2 * phi)
-      sy += weight * Math.sin(2 * phi)
+    // Zero means the tile's own u axis is the local east and its v axis the
+    // local north: every photograph sits square on the horizon of the sphere,
+    // which is what makes the courses read as courses.
+    if (maxTilt > 0) {
+      const { tangent, bitangent } = tangentBasis(c)
+      // Neighbour directions are axes, not vectors (a neighbour at φ and one at
+      // φ+π constrain the same axis), so average them in doubled-angle space:
+      // Σ d²·(cos2φ, sin2φ). Half the resulting angle is the direction in which
+      // neighbours sit furthest away — the roomy axis of this tile's cell.
+      let sx = 0
+      let sy = 0
+      for (const j of neighbourIdx[i]) {
+        const { u, v, angle } = tangentOffset(c, tangent, bitangent, at(j))
+        const phi = Math.atan2(v, u)
+        const weight = angle * angle
+        sx += weight * Math.cos(2 * phi)
+        sy += weight * Math.sin(2 * phi)
+      }
+      let rot = 0.5 * Math.atan2(sy, sx)
+      // A portrait wants its *height* along the roomy axis, so turn it a
+      // quarter — but only when the budget can actually express a quarter
+      // turn. Under a tight clamp the turn would just saturate, leaning every
+      // portrait the same way for no reason; upright is the better default.
+      if (aspect < 1 && maxTilt >= Math.PI / 4) rot += Math.PI / 2
+      rot = foldAxisAngle(rot)
+      // Clamp: the alignment is only ever a nudge. Photos stay near the local
+      // horizon so the surface reads as laid rather than thrown.
+      rotations[i] = Math.max(-maxTilt, Math.min(maxTilt, rot))
     }
-    let rot = 0.5 * Math.atan2(sy, sx)
-    // A portrait wants its *height* along the roomy axis, so turn it a quarter.
-    if (aspect < 1) rot += Math.PI / 2
-    rot = foldAxisAngle(rot)
-    // Clamp: the alignment is only ever a nudge. Photos stay near the local
-    // horizon so the surface reads as laid rather than thrown.
-    rotations[i] = Math.max(-maxTilt, Math.min(maxTilt, rot))
 
     // --- size ---------------------------------------------------------------
     // Native aspect is non-negotiable, so only one degree of freedom is left.
@@ -266,6 +296,49 @@ export function shuffledIndices(n: number, seed: number): number[] {
     idx[j] = tmp
   }
   return idx
+}
+
+/**
+ * Order the photographs light-to-dark, so that the lattice lays them out as a
+ * tone rather than as a scatter.
+ *
+ * {@link fibonacciSphere} walks y from +1 down to −1, so lattice index *is*
+ * latitude: index 0 is the north pole and index n−1 the south. Handing it a
+ * list sorted by brightness therefore puts the bright frames at the top of the
+ * globe and the dark ones underneath, and — because the sphere spins about
+ * that same axis — the gradient stays put while everything else turns.
+ *
+ * That is worth more than it sounds. Randomly assigned, a near-black frame
+ * lands next to a blown-out sky and the eye reads the surface as noise; the
+ * photographs fight each other instead of adding up. Sorted, neighbours relate,
+ * the globe picks up a light-from-above shading that reinforces its roundness,
+ * and nothing about any individual photograph is altered to get it.
+ *
+ * `tiebreak` is applied before the sort and survives it (the sort is stable),
+ * which keeps frames of equal tone off the filename order they arrived in.
+ */
+export function tonalOrder(
+  luminances: readonly number[],
+  tiebreak: readonly number[] = [],
+): number[] {
+  const order = tiebreak.length === luminances.length
+    ? tiebreak.slice()
+    : Array.from({ length: luminances.length }, (_, i) => i)
+  return order.sort((a, b) => luminances[b] - luminances[a])
+}
+
+/**
+ * Relative luminance of a `#rrggbb` colour, 0–1. Rec. 709 coefficients, on the
+ * sRGB values as stored — this is used only to *rank* photographs against each
+ * other, never to change how one is drawn.
+ */
+export function hexLuminance(hex: string): number {
+  const n = Number.parseInt(hex.replace('#', ''), 16)
+  if (!Number.isFinite(n)) return 0.5
+  const r = (n >> 16) & 255
+  const g = (n >> 8) & 255
+  const b = n & 255
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
 }
 
 /**

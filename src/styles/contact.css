@@ -208,10 +208,28 @@
 .cf__lede {
   margin: clamp(1.25rem, 3vh, 2rem) 0 0;
   max-width: 32ch;
+  display: grid;
   font-size: var(--step-1);
   font-weight: 300;
   line-height: 1.5;
   color: var(--ink-soft);
+}
+
+/* Stacked like the headings above, for the same reason. */
+.cf__ledeLayer {
+  grid-area: 1 / 1;
+  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease);
+}
+
+.cf__ledeLayer[data-on='false'] {
+  opacity: 0;
+  transform: translateY(-0.35em);
+  pointer-events: none;
+}
+
+.cf__ledeLayer[data-on='true'] {
+  opacity: 1;
+  transform: none;
 }
 
 .cf__meta {
@@ -382,6 +400,7 @@ textarea.cf__input {
 .cf__row.is-error .cf__rule { height: 1.5px; background: var(--ink); }
 
 .cf__err {
+  grid-column: 2;
   display: block;
   margin-top: 0.6rem;
   font-family: var(--font-mono);
@@ -525,8 +544,12 @@ textarea.cf__input {
 }
 
 .cf__alertLink {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.5rem;
   color: inherit;
-  white-space: nowrap;
+  overflow-wrap: break-word;
   border-bottom: 1px solid var(--line);
   text-decoration: none;
   transition: border-color 0.3s var(--ease);
@@ -541,8 +564,9 @@ textarea.cf__input {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(1.25rem, 3vh, 2rem);
-  padding-top: var(--cf-lift);
+  gap: clamp(1.5rem, 4vh, 2.5rem);
+  /* Sits in the field column the form vacated, not over the frame numbers. */
+  padding-left: calc(2.25rem + clamp(0.5rem, 1.2vw, 1rem));
   outline: none;
 }
 
@@ -667,15 +691,27 @@ textarea.cf__input {
   .cf__intro { grid-area: auto; }
   .cf__form,
   .cf__done  { grid-area: auto; }
-  .cf__meta  { grid-area: auto; align-self: stretch; }
+  .cf__meta  { grid-area: auto; align-self: stretch; margin-top: 0; }
   .cf__lede { max-width: 42ch; }
+}
+
+/* One column and a phone's worth of height: the intro must not push the first
+   field below the fold. */
+@media (max-width: 640px) {
+  .cf__lede {
+    font-size: clamp(1rem, 0.92rem + 0.5vw, 1.15rem);
+    line-height: 1.55;
+    margin-top: clamp(0.9rem, 2vh, 1.25rem);
+  }
 }
 
 @media (max-width: 560px) {
   .cf__row,
   .cf__row--actions { grid-template-columns: minmax(0, 1fr); }
   .cf__idx { display: none; }
-  .cf__actions { grid-column: 1; }
+  .cf__actions,
+  .cf__err { grid-column: 1; }
+  .cf__done { padding-left: 0; }
   .cf__send { min-width: 0; }
   .cf__meta { flex-direction: column; gap: 1.25rem; }
 }

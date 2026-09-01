@@ -1,0 +1,102 @@
+/*
+ * Scroll choreography — the only CSS the landing page needs for the sphere to
+ * hold still while the document scrolls past it.
+ *
+ * Everything here is gated on `html.choreo-on`, a class that exists only while
+ * <ScrollChoreography /> is mounted and reduced motion is off. Unmount it (or
+ * ask for reduced motion) and the page is exactly what it was before: a
+ * full-viewport stage and nothing to scroll.
+ */
+
+/* The stage is pinned rather than sticky: `position: sticky` would need a
+   parent taller than the viewport, and Landing's <main> is 100dvh by design.
+   This is the one rule that reaches into a class owned by Sphere/ — it changes
+   where that element sits, never how it draws. */
+html.choreo-on .sphere-stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+}
+
+/* tokens.css sets `canvas { touch-action: none }`, which is right for a canvas
+   you drag but wrong for one you scroll past: on a phone it would swallow every
+   vertical swipe. Vertical panning goes back to the platform; horizontal is
+   ours, and pinch-zoom stays with the user, who may well need it.
+
+   Note the descendant selector rather than `.sphere-stage__canvas`: r3f puts
+   the className on a wrapper <div> and the real <canvas> is two levels inside
+   it, so the class alone would never outrank the bare `canvas` rule. */
+html.choreo-on .sphere-stage canvas {
+  touch-action: pan-y pinch-zoom;
+}
+
+html.choreo-on.choreo-dragging,
+html.choreo-on.choreo-dragging .sphere-stage,
+html.choreo-on.choreo-dragging .sphere-stage canvas {
+  cursor: grabbing;
+}
+
+/* ── The scroll range ─────────────────────────────────────────────────────
+   An empty block whose height is the whole choreography. The component sets it
+   in pixels from the measured viewport; the inline vh value it starts with is
+   there so a reload half way down the page is not clamped back to the top
+   before the first effect runs. */
+.choreo__spacer {
+  width: 100%;
+  pointer-events: none;
+  /* The document never reflows here, so scroll anchoring has nothing useful to
+     do and can only ever fight the choreography. */
+  overflow-anchor: none;
+}
+
+/* ── The cue ──────────────────────────────────────────────────────────────
+   Hidden unless the choreography is actually running, so it can never invite a
+   scroll that does nothing (reduced motion, or the component unmounted). */
+.choreo__cue {
+  display: none;
+}
+
+html.choreo-on .choreo__cue {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1.5rem, 4vh, 3rem);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(-50%);
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  pointer-events: none;
+  /* The component writes `opacity` inline every time the rounded value changes;
+     this is only the value before the first frame lands. */
+  opacity: 1;
+}
+
+.choreo__cue-word {
+  /* The tracking above adds a trailing gap that visually decentres the word. */
+  padding-left: 0.22em;
+}
+
+.choreo__cue-line {
+  width: 1px;
+  height: 2.25rem;
+  background: linear-gradient(to bottom, var(--line), transparent);
+  transform-origin: top;
+  animation: choreo-cue-fall 2.6s var(--ease) infinite;
+}
+
+@keyframes choreo-cue-fall {
+  0%       { transform: scaleY(0.35); opacity: 0.2; }
+  45%      { transform: scaleY(1);    opacity: 1; }
+  100%     { transform: scaleY(1);    opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choreo__cue-line { animation: none; }
+}

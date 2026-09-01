@@ -3,7 +3,13 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 import type { Photo } from '../../types'
-import { distanceForViewportFraction, layoutTiles, shuffledIndices } from '../../lib/sphereMath'
+import {
+  distanceForViewportFraction,
+  hexLuminance,
+  layoutTiles,
+  shuffledIndices,
+  tonalOrder,
+} from '../../lib/sphereMath'
 import { sphereDrive, type SphereDrive } from './sphereDrive'
 import { sphereFragmentShader, sphereVertexShader } from './shaders'
 import type { AtlasKind } from './useAtlasTexture'
@@ -23,7 +29,7 @@ export const SPHERE_FOV = 35
 export const VIEWPORT_FRACTION = 0.68
 
 /** Ambient spin, radians per second. */
-export const SPIN_SPEED = 0 // TEMP-FREEZE
+export const SPIN_SPEED = 0.028
 
 /** Resting tilt of the spin axis: a lean toward the viewer and a roll, so the
  *  pole never sits dead centre and the rotation reads as a globe's. */
@@ -38,9 +44,9 @@ export const RELIEF = 0.003
  *  size; the whole sphere is still only ~47k triangles in one draw call. */
 export const TILE_SEGMENTS = 12
 
-/** Shuffles which photo lands on which lattice point, so portraits, panoramas
- *  and dark frames spread out instead of clumping in filename order. 0 keeps
- *  the manifest order. */
+/** Breaks ties in the tonal ordering below, so two photographs of the same
+ *  average tone are not left in filename order (which clusters a shoot's frames
+ *  together). 0 keeps the manifest order. */
 export const PLACEMENT_SEED = 20250901
 
 /** Half-texel inset on each atlas rect, in atlas pixels. The packer already
@@ -77,7 +83,12 @@ export default function PhotoSphere({
 
   const geometry = useMemo(() => {
     const base = new THREE.PlaneGeometry(1, 1, TILE_SEGMENTS, TILE_SEGMENTS)
-    const order = shuffledIndices(photos.length, PLACEMENT_SEED)
+    // Light frames toward the north pole, dark ones toward the south. The
+    // lattice walks north to south, so this is the whole of the arrangement.
+    const order = tonalOrder(
+      photos.map((p) => hexLuminance(p.color)),
+      shuffledIndices(photos.length, PLACEMENT_SEED),
+    )
     const placed = order.map((i) => photos[i])
     const layout = layoutTiles(placed.map((p) => p.aspect))
 

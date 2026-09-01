@@ -55,7 +55,7 @@ export const isContactConfigured: boolean = CONTACT_ENDPOINT.length > 0
 
 const TIMEOUT_MS = 15_000
 
-const DIRECT = `write to ${SITE.email} instead`
+const DIRECT = 'write to me directly'
 
 /** Plain-English failures. No status codes leaking as jargon, no stack traces. */
 function describeStatus(code: number): string {

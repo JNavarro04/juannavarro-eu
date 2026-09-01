@@ -61,8 +61,10 @@ function validate(values: Values): Errors {
  * close request and the end of its exit animation.
  */
 export default function ContactForm({ open, onClose }: ContactFormProps): JSX.Element | null {
-  const [visible, setVisible] = useState(open)
+  /* `closing` keeps the overlay mounted for the length of its exit animation
+     after `open` goes false. Whether to render at all is derived, not stored. */
   const [closing, setClosing] = useState(false)
+  const [prevOpen, setPrevOpen] = useState(open)
 
   const [values, setValues] = useState<Values>(EMPTY)
   const [errors, setErrors] = useState<Errors>({})
@@ -86,13 +88,8 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
   const backdropPress = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
   const sealTimer = useRef<number | null>(null)
+  const noticeTimer = useRef<number | null>(null)
   const alive = useRef(true)
-  const statusRef = useRef<Status>('idle')
-  const wasOpen = useRef(open)
-
-  useEffect(() => {
-    statusRef.current = status
-  }, [status])
 
   useEffect(() => {
     alive.current = true
@@ -100,7 +97,20 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
       alive.current = false
       abortRef.current?.abort()
       if (sealTimer.current !== null) window.clearTimeout(sealTimer.current)
+      if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current)
     }
+  }, [])
+
+  /**
+   * Speak to the live region. Emptying it first is what makes an identical
+   * sentence — submitting the same empty form twice — announce a second time.
+   */
+  const announce = useCallback((text: string) => {
+    if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current)
+    setAnnouncement('')
+    noticeTimer.current = window.setTimeout(() => {
+      if (alive.current) setAnnouncement(text)
+    }, 60)
   }, [])
 
   const requestClose = useCallback(() => {
@@ -109,37 +119,30 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
 
   /* --- mount / exit ------------------------------------------------------ */
 
-  useEffect(() => {
-    const previously = wasOpen.current
-    wasOpen.current = open
-
-    if (open) {
-      setClosing(false)
-      setVisible(true)
+  // Adjusted during render rather than in an effect: React re-runs this pass
+  // before committing, so the overlay never paints in a stale state.
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    setClosing(!open)
+    if (open && (status === 'sent' || status === 'handoff')) {
       // A finished conversation starts over; an unsent draft is kept.
-      if (!previously && (statusRef.current === 'sent' || statusRef.current === 'handoff')) {
-        setValues(EMPTY)
-        setErrors({})
-        setSubmitted(false)
-        setStatus('idle')
-        setFailure('')
-        setSettled(false)
-        setAnnouncement('')
-      }
-      return
+      setValues(EMPTY)
+      setErrors({})
+      setSubmitted(false)
+      setStatus('idle')
+      setFailure('')
+      setSettled(false)
+      setAnnouncement('')
     }
+  }
 
-    if (!previously) return
-    setClosing(true)
-    const timer = window.setTimeout(
-      () => {
-        setVisible(false)
-        setClosing(false)
-      },
-      reduced() ? 0 : EXIT_MS,
-    )
+  const visible = open || closing
+
+  useEffect(() => {
+    if (!closing) return
+    const timer = window.setTimeout(() => setClosing(false), reduced() ? 0 : EXIT_MS)
     return () => window.clearTimeout(timer)
-  }, [open])
+  }, [closing])
 
   /* --- body scroll lock -------------------------------------------------- */
 
@@ -159,6 +162,30 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
     }
   }, [visible])
 
+  /* --- the rest of the page goes inert ------------------------------------ */
+
+  /*
+   * aria-modal tells a screen reader to ignore everything outside the dialog;
+   * inert makes it true for every input method. Declared above the focus
+   * effect on purpose — cleanups run in declaration order, so the trigger is
+   * interactive again by the time focus is handed back to it.
+   */
+  useEffect(() => {
+    if (!visible) return
+    const overlay = rootRef.current
+    const silenced: HTMLElement[] = []
+
+    for (const child of Array.from(document.body.children)) {
+      if (child === overlay || !(child instanceof HTMLElement) || child.inert) continue
+      child.inert = true
+      silenced.push(child)
+    }
+
+    return () => {
+      for (const el of silenced) el.inert = false
+    }
+  }, [visible])
+
   /* --- focus in, focus back ---------------------------------------------- */
 
   useEffect(() => {
@@ -168,13 +195,11 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
     // On touch, focusing a field would throw the keyboard up before the
     // visitor has read anything. Land on the dialog instead.
     const coarse = window.matchMedia('(pointer: coarse)').matches
-    const frame = window.requestAnimationFrame(() => {
-      const target = coarse ? dialogRef.current : (inputs.current.name ?? dialogRef.current)
-      target?.focus()
-    })
+    const target = coarse ? dialogRef.current : (inputs.current.name ?? dialogRef.current)
+    // preventScroll: the entrance animation is still running underneath.
+    target?.focus({ preventScroll: true })
 
     return () => {
-      window.cancelAnimationFrame(frame)
       opener?.focus()
     }
   }, [visible])
@@ -304,7 +329,7 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
     const firstBad = ORDER.find((field) => found[field])
     if (firstBad) {
       const count = ORDER.filter((field) => found[field]).length
-      setAnnouncement(
+      announce(
         `${count === 1 ? 'One field needs' : `${count} fields need`} attention. ${found[firstBad] ?? ''}`,
       )
       inputs.current[firstBad]?.focus()
@@ -322,7 +347,7 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
     }
 
     setStatus('sending')
-    setAnnouncement('Sending your message.')
+    announce('Sending your message.')
 
     const controller = new AbortController()
     abortRef.current = controller
@@ -333,12 +358,12 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
     if (outcome.status === 'failed') {
       setStatus('failed')
       setFailure(outcome.message)
-      setAnnouncement(outcome.message)
+      announce(outcome.message)
       return
     }
 
     setStatus(outcome.status)
-    setAnnouncement(
+    announce(
       outcome.status === 'sent'
         ? 'Your message was sent.'
         : 'Your mail app has been opened with the message ready to send.',
@@ -432,12 +457,13 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
             {label}
           </label>
           <span className="cf__rule" aria-hidden="true" />
-          {error ? (
-            <span className="cf__err" id={errorId}>
-              {error}
-            </span>
-          ) : null}
         </div>
+        {/* Outside .cf__field, or it would push the rule off the input. */}
+        {error ? (
+          <span className="cf__err" id={errorId}>
+            {error}
+          </span>
+        ) : null}
       </div>
     )
   }
@@ -476,7 +502,8 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
                   <line x1="1" y1="1" x2="11" y2="11" />
                   <line x1="11" y1="1" x2="1" y2="11" />
                 </svg>
-                <span className="cf__sr">contact form</span>
+                {/* Makes the accessible name read "Close contact form". */}
+                <span className="cf__sr">{' contact form'}</span>
               </button>
             </div>
 
@@ -491,8 +518,23 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
                   </span>
                 </h2>
                 <p className="cf__lede cf__rise" id={ledeId} data-rise={4}>
-                  Commissions, prints, or a question about a frame. Every message comes
-                  straight to me, and I answer them myself.
+                  <span className="cf__ledeLayer" data-on={String(!settled)} aria-hidden={settled}>
+                    Commissions, prints, or a question about a frame. Every message
+                    comes straight to me, and I answer them myself.
+                  </span>
+                  <span className="cf__ledeLayer" data-on={String(settled)} aria-hidden={!settled}>
+                    {status === 'handoff' ? (
+                      <>
+                        Your mail app should have opened with the message inside. Press
+                        send there and it reaches me.
+                      </>
+                    ) : (
+                      <>
+                        Thank you{first ? `, ${first}` : ''}. It is in my inbox — I’ll
+                        reply from {SITE.email}, usually within a couple of days.
+                      </>
+                    )}
+                  </span>
                 </p>
               </div>
 
@@ -510,20 +552,13 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
 
                   {status === 'handoff' ? (
                     <p className="cf__doneText cf__rise" data-settle={2}>
-                      Your mail app should have opened with the message inside — press
-                      send there and it reaches me. If nothing happened,{' '}
+                      Nothing opened?{' '}
                       <a className="cf__doneLink" href={mailtoHref(values)}>
-                        open it manually
+                        Open the message by hand
                       </a>
                       .
                     </p>
-                  ) : (
-                    <p className="cf__doneText cf__rise" data-settle={2}>
-                      Thank you{first ? <>, <strong>{first}</strong></> : null}. It landed
-                      in my inbox and I’ll reply from{' '}
-                      <strong>{SITE.email}</strong> — usually within a couple of days.
-                    </p>
-                  )}
+                  ) : null}
 
                   <button
                     type="button"
@@ -593,11 +628,10 @@ export default function ContactForm({ open, onClose }: ContactFormProps): JSX.El
 
                       {failure ? (
                         <p className="cf__alert" id={alertId}>
-                          {failure}{' '}
+                          {failure}
                           <a className="cf__alertLink" href={mailtoHref(values)}>
-                            Write directly
+                            {SITE.email}
                           </a>
-                          .
                         </p>
                       ) : null}
 
