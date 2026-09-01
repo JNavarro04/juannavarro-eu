@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "assets": "node scripts/build-assets.mjs"
+    "assets": "node scripts/build-assets.mjs",
+    "titles": "node scripts/make-titles-sheet.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

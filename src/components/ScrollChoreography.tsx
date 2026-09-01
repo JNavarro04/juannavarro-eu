@@ -59,6 +59,10 @@ import '../styles/choreography.css'
  *
  *   DRAG is rotation and nothing else. Both axes, with momentum on release.
  *
+ * Under prefers-reduced-motion both still work and neither is animated — see
+ * the note in the effect below. The mode drops the ambient spin, the easing and
+ * the flick; it does not drop the ability to look at the other hemisphere.
+ *
  * On touch those two are the same physical gesture, so they are separated in
  * time rather than in space: while the zoom still has somewhere to go, a swipe
  * scrolls; once the document is at its bottom and the camera is at the stop, the
@@ -71,8 +75,12 @@ import '../styles/choreography.css'
 
 /* ── The seam this component publishes to the rest of the page ─────────────
  *
- *  <html class="choreo-on choreo-zoomed choreo-locked choreo-dragging"
+ *  <html class="choreo-on choreo-zoomed choreo-locked choreo-dragging choreo-still"
  *        style="--choreo-progress: 0…1; --choreo-text-opacity: 0…1">
+ *
+ * `choreo-still` means reduced motion: the choreography is live, but nothing
+ * eases and nothing glides. Anything else on the page that animates itself off
+ * `--choreo-progress` should honour it.
  *
  * Any landing text can fade itself out with
  *   opacity: var(--choreo-text-opacity, 1)
@@ -82,6 +90,8 @@ const ACTIVE_CLASS = 'choreo-on'
 const ZOOMED_CLASS = 'choreo-zoomed'
 const LOCKED_CLASS = 'choreo-locked'
 const DRAGGING_CLASS = 'choreo-dragging'
+/** Reduced motion: the choreography runs, but nothing eases and nothing glides. */
+const STILL_CLASS = 'choreo-still'
 const PROGRESS_VAR = '--choreo-progress'
 const TEXT_OPACITY_VAR = '--choreo-text-opacity'
 
@@ -92,6 +102,23 @@ const FALLBACK_SCREENS = ZOOM_SCREENS + 1
 
 /** Gestures that start on these never orbit the sphere. */
 const INTERACTIVE = 'a, button, input, textarea, select, label, summary, [role="button"], [contenteditable]'
+
+/**
+ * The three numbers this file borrows from PhotoSphere, read defensively.
+ *
+ * Sphere/** is being retuned alongside this file, and a constant that arrives as
+ * NaN or 0 in the middle of an edit would not merely look wrong — it would put
+ * the camera inside the shell. Deferring to the real value and falling back to
+ * the value it has today keeps the landing page standing either way.
+ */
+const usable = (value: number, fallback: number): number =>
+  Number.isFinite(value) && value > 0 ? value : fallback
+
+const SPHERE = {
+  radius: usable(SPHERE_RADIUS, 1),
+  fovDegrees: usable(SPHERE_FOV, 35),
+  viewportFraction: usable(VIEWPORT_FRACTION, 0.68),
+}
 
 export type ScrollChoreographyProps = {
   /** The scroll cue's words. Pass an empty string to render no cue at all. */
@@ -134,27 +161,34 @@ export default function ScrollChoreography({
     const cueEl = cueRef.current
     const backEl = backRef.current
 
-    // ── prefers-reduced-motion: reduce ───────────────────────────────────
-    // No scroll-driven camera motion at all, and no scroll range to drive it
-    // with. The resting sphere, and a page that scrolls like a page. Clicks on
-    // the photographs still work, so the page is still usable without motion.
-    if (reducedMotion) {
-      Object.assign(target, SPHERE_DRIVE_DEFAULTS)
-      if (spacer) spacer.style.height = '0px'
-      return () => {
-        Object.assign(target, SPHERE_DRIVE_DEFAULTS)
-      }
-    }
-
+    /*
+     * ── prefers-reduced-motion: reduce ──────────────────────────────────
+     *
+     * Everything below stays mounted and every gesture keeps working. What the
+     * mode removes is motion the visitor did not ask for and cannot stop:
+     *
+     *   off — the ambient spin, the eased dolly, the flick that keeps gliding
+     *         after release, and every other easing that outlives the gesture
+     *         that started it (`damping` below becomes an assignment).
+     *   on  — drag to orbit and scroll to zoom, both tracking the input frame
+     *         for frame and both perfectly still the moment it stops.
+     *
+     * Direct manipulation is not the motion the media query is about: the
+     * visitor is moving it themselves and it halts when they let go. Turning it
+     * off would leave them with one static hemisphere and no way to reach the
+     * photographs on the other side — a usability regression wearing an
+     * accessibility badge.
+     */
     root.classList.add(ACTIVE_CLASS)
+    if (reducedMotion) root.classList.add(STILL_CLASS)
 
     /* ── State. All of it lives here, none of it in React. ──────────────── */
     let geometry: ViewGeometry = viewGeometry({
       width: window.innerWidth,
       height: window.innerHeight,
-      radius: SPHERE_RADIUS,
-      fovDegrees: SPHERE_FOV,
-      viewportFraction: VIEWPORT_FRACTION,
+      radius: SPHERE.radius,
+      fovDegrees: SPHERE.fovDegrees,
+      viewportFraction: SPHERE.viewportFraction,
     })
     let lengths: ScrollLengths = scrollLengths(window.innerHeight)
 
@@ -205,9 +239,9 @@ export default function ScrollChoreography({
       geometry = viewGeometry({
         width,
         height,
-        radius: SPHERE_RADIUS,
-        fovDegrees: SPHERE_FOV,
-        viewportFraction: VIEWPORT_FRACTION,
+        radius: SPHERE.radius,
+        fovDegrees: SPHERE.fovDegrees,
+        viewportFraction: SPHERE.viewportFraction,
       })
       lengths = scrollLengths(height)
       if (spacer) spacer.style.height = `${Math.round(lengths.spacerPx)}px`
@@ -382,9 +416,11 @@ export default function ScrollChoreography({
         ORBIT_LATITUDE_LIMIT,
       )
 
-      const dt = Math.max(8, event.timeStamp - lastMoveTime) / 1000
-      velocityLongitude = mixVelocity(velocityLongitude, dx / dt)
-      velocityLatitude = mixVelocity(velocityLatitude, dy / dt)
+      if (!reducedMotion) {
+        const dt = Math.max(8, event.timeStamp - lastMoveTime) / 1000
+        velocityLongitude = mixVelocity(velocityLongitude, dx / dt)
+        velocityLatitude = mixVelocity(velocityLatitude, dy / dt)
+      }
 
       lastPointerX = event.clientX
       lastPointerY = event.clientY
@@ -397,8 +433,9 @@ export default function ScrollChoreography({
       if (event.pointerId !== dragId) return
 
       if (dragging) {
-        // A pointer that came to rest before lifting should not fling.
-        if (event.timeStamp - lastMoveTime > FLICK_IDLE_MS) {
+        // A pointer that came to rest before lifting should not fling — and
+        // under reduced motion nothing ever flings: letting go is a full stop.
+        if (reducedMotion || event.timeStamp - lastMoveTime > FLICK_IDLE_MS) {
           velocityLongitude = 0
           velocityLatitude = 0
         }
@@ -441,6 +478,7 @@ export default function ScrollChoreography({
 
       // Momentum: the flick keeps feeding the *target*, and the same damping
       // that smooths a drag smooths the glide, so the two cannot disagree.
+      // Reduced motion never has any: the velocity is dropped on release.
       if (!dragging && (velocityLongitude !== 0 || velocityLatitude !== 0)) {
         targetOrbit.longitude += velocityLongitude * dt
         const next = clamp(
@@ -461,16 +499,26 @@ export default function ScrollChoreography({
         }
       }
 
-      currentProgress = damp(currentProgress, targetProgress, PROGRESS_DAMPING, dt)
-      currentOrbit.longitude = damp(
-        currentOrbit.longitude,
-        targetOrbit.longitude,
-        ORBIT_DAMPING,
-        dt,
-      )
-      currentOrbit.latitude = damp(currentOrbit.latitude, targetOrbit.latitude, ORBIT_DAMPING, dt)
+      // Under reduced motion the damping is an assignment: the camera is
+      // wherever the scrollbar and the finger have put it this frame, and it
+      // stops dead when they do. Everywhere else it lags them, which is the
+      // whole difference between cheap and expensive.
+      if (reducedMotion) {
+        currentProgress = targetProgress
+        currentOrbit.longitude = targetOrbit.longitude
+        currentOrbit.latitude = targetOrbit.latitude
+      } else {
+        currentProgress = damp(currentProgress, targetProgress, PROGRESS_DAMPING, dt)
+        currentOrbit.longitude = damp(
+          currentOrbit.longitude,
+          targetOrbit.longitude,
+          ORBIT_DAMPING,
+          dt,
+        )
+        currentOrbit.latitude = damp(currentOrbit.latitude, targetOrbit.latitude, ORBIT_DAMPING, dt)
+      }
 
-      const frame = frameForProgress(currentProgress, currentOrbit, geometry)
+      const frame = frameForProgress(currentProgress, currentOrbit, geometry, reducedMotion)
       currentDistanceScale = frame.distanceScale
 
       target.distanceScale = frame.distanceScale
@@ -529,7 +577,7 @@ export default function ScrollChoreography({
       window.removeEventListener('click', onClickCapture, true)
       backEl?.removeEventListener('click', onBack)
       endDrag()
-      root.classList.remove(ACTIVE_CLASS, ZOOMED_CLASS, LOCKED_CLASS, DRAGGING_CLASS)
+      root.classList.remove(ACTIVE_CLASS, ZOOMED_CLASS, LOCKED_CLASS, DRAGGING_CLASS, STILL_CLASS)
       root.style.removeProperty(PROGRESS_VAR)
       root.style.removeProperty(TEXT_OPACITY_VAR)
       // /info and back must not inherit a camera dived into the surface.
@@ -548,11 +596,14 @@ export default function ScrollChoreography({
       <button className="choreo__back" ref={backRef} type="button">
         {backLabel}
       </button>
+      {/* The scroll range exists in every motion mode — under reduced motion it
+          is how the visitor gets close to the photographs, just without the
+          eased dolly on the way. */}
       <div
         className="choreo__spacer"
         ref={spacerRef}
         aria-hidden="true"
-        style={{ height: reducedMotion ? 0 : `${FALLBACK_SCREENS * 100}vh` }}
+        style={{ height: `${FALLBACK_SCREENS * 100}vh` }}
       />
     </div>
   )

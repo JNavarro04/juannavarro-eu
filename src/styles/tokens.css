@@ -11,6 +11,9 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
   --font-mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
   --font-serif: 'Times New Roman', Georgia, serif;
+  /* Display face for the wordmark only. High-contrast serif against the
+     monospace nav — warmth where the rest of the site is geometric. */
+  --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
 
   --step--1: clamp(0.72rem, 0.68rem + 0.2vw, 0.82rem);
   --step-0:  clamp(0.9rem, 0.86rem + 0.2vw, 1rem);

@@ -19,12 +19,62 @@
  * Both are absolute functions of their input, so both are exactly reversible:
  * nothing here accumulates, and scrolling back up retraces the way down.
  *
+ * Under `prefers-reduced-motion: reduce` both still work, and neither is
+ * animated: the caller stops damping and feeds these functions the raw values,
+ * so the sphere tracks the finger and the scrollbar frame for frame and is
+ * perfectly still the instant either stops. What that mode removes is motion the
+ * visitor did not ask for and cannot stop — the ambient spin, the eased dolly,
+ * and the flick that keeps gliding after release. Not the ability to look
+ * around: a static globe shows one hemisphere, and the other 81 photographs
+ * would be unreachable.
+ *
  * Camera model (mirrors PhotoSphere): the camera sits on +Z at
  * `baseDistance * distanceScale` looking down −Z, and never re-targets. The
  * sphere turns under it — `spin` about its own Y (longitude), `tilt` about world
  * X (latitude) — so orbiting is rotation, never a pan.
  */
-import { distanceForViewportFraction } from './sphereMath'
+import * as sphereMath from './sphereMath'
+
+/**
+ * sphereMath is being rewritten underneath this file, so its one helper we need
+ * is looked up rather than imported by name: if it changes shape, disappears, or
+ * starts returning nonsense mid-edit, the mirror below keeps the choreography
+ * framing the sphere correctly instead of taking the landing page down with it.
+ *
+ * The mirror is the formula as of this writing. It is deliberately *only* a
+ * fallback — while the real helper is there we defer to it, so that retuning
+ * VIEWPORT_FRACTION or the projection over there still moves the stop with it.
+ */
+type DistanceForViewportFraction = (
+  radius: number,
+  fovYDegrees: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  fraction: number,
+) => number
+
+const sphereMathHelpers = sphereMath as unknown as Partial<{
+  distanceForViewportFraction: DistanceForViewportFraction
+}>
+
+function restingDistance(
+  radius: number,
+  fovYDegrees: number,
+  width: number,
+  height: number,
+  fraction: number,
+): number {
+  const helper = sphereMathHelpers.distanceForViewportFraction
+  if (typeof helper === 'function') {
+    const distance = helper(radius, fovYDegrees, width, height, fraction)
+    if (Number.isFinite(distance) && distance > radius) return distance
+  }
+  const spanOfHeight = (Math.min(width, height) * fraction) / Math.max(1, height)
+  const tanHalfFov = Math.tan((fovYDegrees * Math.PI) / 360)
+  const tanBeta = Math.max(1e-4, spanOfHeight * tanHalfFov)
+  const sinBeta = Math.min(0.98, tanBeta / Math.sqrt(1 + tanBeta * tanBeta))
+  return radius / sinBeta
+}
 
 /* ── Tuning: the zoom ────────────────────────────────────────────────────── */
 
@@ -190,7 +240,7 @@ export function viewGeometry(input: ViewGeometryInput): ViewGeometry {
     radius * MAX_STOP_DISTANCE,
   )
 
-  const baseDistance = distanceForViewportFraction(radius, fovDegrees, w, h, viewportFraction)
+  const baseDistance = restingDistance(radius, fovDegrees, w, h, viewportFraction)
 
   return {
     baseDistance,
@@ -302,11 +352,17 @@ export type ChoreoFrame = {
  * `progress` is the damped value, not the raw one, and `orbit` is the damped
  * orbit. Distance comes from scrolling and only from scrolling; rotation comes
  * from dragging and only from dragging.
+ *
+ * Under `reducedMotion` the shape of every curve is unchanged — what changes is
+ * that the caller feeds this the *undamped* values, so nothing keeps moving once
+ * the visitor stops. The one thing switched off here is the ambient spin, which
+ * is the only motion in the whole page that runs on its own.
  */
 export function frameForProgress(
   progress: number,
   orbit: OrbitState,
   geom: ViewGeometry,
+  reducedMotion = false,
 ): ChoreoFrame {
   const p = clamp01(progress)
   const eased = smootherstep(p)
@@ -317,7 +373,8 @@ export function frameForProgress(
     distanceScale: Math.pow(geom.stopScale, eased),
     spin: orbit.longitude,
     tilt: clamp(orbit.latitude, -ORBIT_LATITUDE_LIMIT, ORBIT_LATITUDE_LIMIT),
-    spinScale: 1 - smootherstep(p / SPIN_FADE_END),
+    // Unprompted motion, and the only motion here nobody asked for: off.
+    spinScale: reducedMotion ? 0 : 1 - smootherstep(p / SPIN_FADE_END),
     textOpacity: 1 - smootherstep(p / TEXT_FADE_END),
   }
 }

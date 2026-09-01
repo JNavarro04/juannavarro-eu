@@ -176,7 +176,17 @@ html.choreo-on .choreo__back:focus-visible {
   outline-offset: 3px;
 }
 
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   The choreography itself keeps running — scroll still sets the distance and
+   drag still turns the sphere, both tracking the input frame for frame and both
+   stopping dead with it. What goes is everything that moves on its own: the
+   cue's falling hairline and the control's fade. `choreo-still` is the same
+   rule keyed off the class the component sets, so this holds even for a visitor
+   whose preference arrives after load. */
 @media (prefers-reduced-motion: reduce) {
   .choreo__cue-line { animation: none; }
   html.choreo-on .choreo__back { transition: none; }
 }
+
+html.choreo-still .choreo__cue-line { animation: none; }
+html.choreo-still .choreo__back { transition: none; }

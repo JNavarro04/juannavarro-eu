@@ -31,10 +31,34 @@ export const VIEWPORT_FRACTION = 0.68
 /** Ambient spin, radians per second. */
 export const SPIN_SPEED = 0.028
 
-/** Resting tilt of the spin axis: a lean toward the viewer and a roll, so the
- *  pole never sits dead centre and the rotation reads as a globe's. */
+/**
+ * How far the courses rise, left to right, in degrees off horizontal on screen.
+ *
+ * The photographs are laid in bands of latitude, so what the viewer reads as
+ * "the lines" are the sphere's parallels, and their angle is set entirely by
+ * where the polar axis points. Tilting the axis is the only honest way to do
+ * this: rotating the tiles instead would turn each photograph within its own
+ * course and the courses would stop being lines.
+ */
+export const BAND_AXIS_TILT_DEG = 20
+
+/** Lean of the spin axis toward the viewer. Small on purpose: it is what makes
+ *  the courses bow like lines of latitude instead of running dead straight, and
+ *  at this value it also keeps both poles a few degrees *behind* the silhouette,
+ *  so the one place a band layout cannot tile is never in shot. */
 export const AXIS_TILT_X = 0.1
-export const AXIS_TILT_Z = 0.2
+
+/**
+ * Roll of the spin axis, radians.
+ *
+ * Derived rather than chosen. A pole leaned by `AXIS_TILT_X` and rolled by this
+ * lands on screen at atan(tan(roll) / cos(lean)) off vertical, and the courses
+ * are perpendicular to it, so inverting that puts them at exactly
+ * {@link BAND_AXIS_TILT_DEG}.
+ */
+export const AXIS_TILT_Z = Math.atan(
+  Math.tan((BAND_AXIS_TILT_DEG * Math.PI) / 180) * Math.cos(AXIS_TILT_X),
+)
 
 /** Per-tile radius wobble, as a fraction of the radius. Gives overlaps a
  *  definite stacking order and the surface a little life. */
@@ -84,7 +108,8 @@ export default function PhotoSphere({
   const geometry = useMemo(() => {
     const base = new THREE.PlaneGeometry(1, 1, TILE_SEGMENTS, TILE_SEGMENTS)
     // Light frames toward the north pole, dark ones toward the south. The
-    // lattice walks north to south, so this is the whole of the arrangement.
+    // courses are filled north to south from this order, so each one is a
+    // narrow slice of tone and the globe shades along its own tilted axis.
     const order = tonalOrder(
       photos.map((p) => hexLuminance(p.color)),
       shuffledIndices(photos.length, PLACEMENT_SEED),

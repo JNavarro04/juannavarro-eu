@@ -130,22 +130,26 @@ export type BandLayoutOptions = {
    * Which parallel a course is solved to fill: 0 its centre line, 1 the edge
    * nearer the pole.
    *
-   * A course is a band of latitude, and the parallel at its top is shorter than
-   * the parallel through its middle — by h·cot θ, which is nothing at the
-   * equator and everything near the pole. Tiles sized to fill the middle
-   * therefore have nowhere to go at the top, and adjacent frames cross at their
-   * pole-facing corners. Measured at joint 0.026:
+   * A course is a band of latitude, and the parallel along its pole-facing edge
+   * is shorter than the one through its middle — by h·cot θ, which is nothing
+   * at the equator and everything near the pole. So tiles sized to fill the
+   * middle exactly have a little less room than they need at that edge, and two
+   * neighbours can graze each other at the corner nearest the pole.
    *
-   *   0.0  87.2% covered, 3.4% double-covered — clean across the middle third
-   *        of the globe, corners crossing in every course above ~60° latitude
-   *   0.5  84.1% covered, 0.6% double-covered
-   *   1.0  80.6% covered, 0.0% double-covered  ← default
+   * Measured at joint 0.024, over the whole sphere and over the part of it the
+   * camera can actually reach:
    *
-   * 1 sizes every course to its tightest parallel, so no two photographs touch
-   * anywhere on the sphere. It costs six points of coverage, all of it spent
-   * widening the joint along each course's equator-facing edge — the courses
-   * taper very slightly toward the poles, which is what brickwork on a dome
-   * does anyway. Overlap is the thing being bought out; coverage is the price.
+   *   0.0  82.5% covered, 0.24% double  (on screen 83.0% / 0.21%)  ← default
+   *   0.5  79%   covered, 0.00% double, but the joint stops being one number:
+   *        the slack that buys the guarantee is spread along each course, and
+   *        the polar courses end up with 25px joints against the equator's 7px
+   *   1.0  76%   covered, 0.00% double, and worse on the same count
+   *
+   * So 0 it is. The quarter of a percent that overlaps is corner grazing in the
+   * three courses closest to each pole, and those sit within a few degrees of
+   * the silhouette where a tile is a couple of pixels tall. Buying it out costs
+   * the one thing the arrangement exists for — a joint that is the same width
+   * everywhere.
    */
   edgeFit: number
   /**
@@ -154,11 +158,10 @@ export type BandLayoutOptions = {
    * parallels and every joint along it is identical.
    *
    * `tallest` gives every tile the same width and lets the heights follow the
-   * aspect, with the course as tall as its squarest photograph. Measured at the
-   * same joint: 66.5% covered against 80.6%, and the loss is not grout — it is
-   * a ragged strip of white above and below every frame that is not the tallest,
-   * which is exactly the missing-photo look the courses were meant to remove.
-   * Kept only so the comparison is reproducible.
+   * aspect, with the course as tall as its squarest photograph. The loss is not
+   * grout — it is a ragged strip of white above and below every frame that is
+   * not the tallest, which is exactly the missing-photo look the courses were
+   * meant to remove. Kept only so the comparison is reproducible.
    */
   heightMode: 'uniform' | 'tallest'
   /** Seed for the bond wobble and the within-course shuffle. */
@@ -171,19 +174,21 @@ export type BandLayoutOptions = {
  * Measured on the real 162-photo manifest, 250k sample directions, against the
  * `fibonacci` lattice this replaced (fill 1.05):
  *
- *   fibonacci   88.5% covered, 14.6% double-covered, worst gap 0.067 rad
- *   bands       80.6% covered,  0.0% double-covered, worst gap 0.099 rad
+ *   fibonacci  88.6% covered, 14.58% double-covered, joints 0 to 20 px
+ *   bands      82.5% covered,  0.24% double-covered, every joint 7.3 px
  *
- * The bands cover less and that is the point: nothing overlaps anything, so
- * every one of the 162 photographs is whole. The eight points of coverage the
- * lattice had were bought by letting frames lie across each other.
+ * The bands cover less and that is the whole point. The six points the lattice
+ * had over them were bought by letting photographs lie across one another —
+ * fifteen percent of the sphere was one frame cutting through another. Here
+ * that number is a quarter of a percent, all of it corner grazing in the
+ * courses nearest the poles, which the framing keeps behind the silhouette.
  */
 export const BAND_LAYOUT_DEFAULTS: BandLayoutOptions = {
-  joint: 0.026,
+  joint: 0.024,
   bond: 0.5,
   bondJitter: 0.18,
   minPerBand: 4,
-  edgeFit: 1,
+  edgeFit: 0,
   heightMode: 'uniform',
   seed: 1337,
 }
@@ -442,74 +447,141 @@ function apportion(total: number, weights: readonly number[]): number[] {
 }
 
 /**
- * Solve one candidate stack of `bandCount` courses.
+ * Fit `bandCount` courses of one shared tile height onto the sphere.
  *
- * Everything here is forced except one number. The tiles per course follow the
- * circumference; the tile height follows from the course having to fill that
- * circumference with photographs of fixed aspect plus one joint each; the joint
- * is given. So the courses come out however tall they come out, they are laid
- * from the north pole downward with a joint between each pair, and whatever is
- * left of the pole-to-pole span is split between the two poles. That leftover —
- * `capGap` — is the only free number, and it is the reason nothing has to
- * overlap: the arrangement is never asked to close a gap it cannot close.
+ * Everything follows from that one height. The course pitch is 2h + joint, so
+ * the courses are evenly spaced by construction — which is the thing the eye
+ * actually reads on a globe. What each course can *hold* is then fixed: at
+ * colatitude θ a course has 2π·sin θ of arc, the photographs in it are h·aspect
+ * wide, and they each need a joint. So the count per course falls out of the
+ * circumference and the height falls out of the count, and the two are settled
+ * against each other by a few passes.
  *
- * A negative `capGap` means the courses do not fit; the caller tries fewer.
+ * `capacity` is measured at the parallel `edgeFit` selects, not at the course's
+ * centre line. That is the whole no-overlap guarantee: a course is never asked
+ * to hold more than its *shortest* parallel can take, so two frames cannot
+ * cross at the corner nearest the pole.
  */
-function solveStack(
-  sums: readonly number[],
-  mins: readonly number[],
-  counts: readonly number[],
+function fitStack(
+  aspects: readonly number[],
+  bandCount: number,
   options: BandLayoutOptions,
-): { theta: number[]; h: number[]; capGap: number } {
-  const b = counts.length
-  const theta: number[] = counts.map((_, k) => ((k + 0.5) * Math.PI) / b)
-  const h: number[] = counts.map(() => Math.PI / (4 * b))
+): { theta: number[]; h: number[]; counts: number[]; starts: number[]; capGap: number } | null {
+  const n = aspects.length
+  if (options.minPerBand * bandCount > n) return null
+
+  // Running sum of aspects. A course is a contiguous slice of the placement
+  // order, so the total width of everything in it is one subtraction.
+  const prefix = new Float64Array(n + 1)
+  for (let i = 0; i < n; i++) prefix[i + 1] = prefix[i] + (aspects[i] > 0 ? aspects[i] : 1)
+
+  /** Arc a course consumes per unit of tile height, joints excluded. */
+  const widthPerHeight = (k: number, counts: readonly number[]): number => {
+    let start = 0
+    for (let i = 0; i < k; i++) start += counts[i]
+    const end = start + counts[k]
+    if (options.heightMode === 'uniform') return 2 * (prefix[end] - prefix[start])
+    let min = Number.POSITIVE_INFINITY
+    for (let i = start; i < end; i++) {
+      const a = aspects[i] > 0 ? aspects[i] : 1
+      if (a < min) min = a
+    }
+    return 2 * counts[k] * (Number.isFinite(min) ? min : 1)
+  }
+
+  const theta: number[] = []
+  const h: number[] = []
+  for (let k = 0; k < bandCount; k++) {
+    theta.push(((k + 0.5) * Math.PI) / bandCount)
+    h.push(Math.PI / (4 * bandCount))
+  }
+  let counts = apportion(n, theta.map((t) => Math.sin(t)))
   let capGap = 0
+
+  /** Tile height that makes course `k` fill its parallel exactly. */
+  const heightOf = (k: number, cs: readonly number[]): number => {
+    const toward = theta[k] < Math.PI / 2 ? -1 : 1
+    const fit = theta[k] + toward * options.edgeFit * h[k]
+    const circumference =
+      2 * Math.PI * Math.sin(Math.max(1e-4, Math.min(Math.PI - 1e-4, fit)))
+    return Math.max(
+      1e-4,
+      (circumference - cs[k] * options.joint) / Math.max(1e-6, widthPerHeight(k, cs)),
+    )
+  }
+
   for (let pass = 0; pass < 80; pass++) {
-    for (let k = 0; k < b; k++) {
-      // `uniform` shares one height and lets widths follow the aspects;
-      // `tallest` shares one width, so the course is as tall as its squarest.
-      const denom =
-        options.heightMode === 'uniform' ? 2 * sums[k] : 2 * counts[k] * mins[k]
-      // The parallel this course has to fit on. Pulling it toward the pole-side
-      // edge is what stops adjacent frames crossing at their top corners.
-      const toward = theta[k] < Math.PI / 2 ? -1 : 1
-      const fit = theta[k] + toward * options.edgeFit * h[k]
-      const circumference = 2 * Math.PI * Math.sin(Math.max(1e-4, Math.min(Math.PI - 1e-4, fit)))
-      const raw = (circumference - counts[k] * options.joint) / Math.max(1e-6, denom)
-      // Damped: `fit` moves with h, so an undamped step can ring near the poles.
-      h[k] = Math.max(1e-4, 0.5 * h[k] + 0.5 * raw)
+    for (let k = 0; k < bandCount; k++) {
+      // `fit` moves with h, so step halfway to stop it ringing near the poles.
+      h[k] = 0.5 * h[k] + 0.5 * heightOf(k, counts)
     }
     let stacked = 0
     for (const hk of h) stacked += 2 * hk
-    capGap = (Math.PI - stacked - (b - 1) * options.joint) / 2
+    capGap = (Math.PI - stacked - (bandCount - 1) * options.joint) / 2
+    if (capGap < -1e-9) return null
     let t = capGap
-    for (let k = 0; k < b; k++) {
+    for (let k = 0; k < bandCount; k++) {
       theta[k] = t + h[k]
       t += 2 * h[k] + options.joint
     }
+
+    // Even out the course heights. Each course is exactly full at the joint it
+    // was given, so the only thing left that can vary is how *tall* it is: a
+    // course that drew four panoramas is wider per photograph and so ends up
+    // shorter than its neighbours. Sliding the boundary between two courses
+    // trades one photograph between them, which evens the two heights without
+    // moving a photograph out of the tonal order — the courses are contiguous
+    // slices of it, so the boundary is all there is to move.
+    for (let sweep = 0; sweep < 200; sweep++) {
+      let changed = false
+      for (let k = 0; k < bandCount - 1; k++) {
+        const before = Math.abs(heightOf(k, counts) - heightOf(k + 1, counts))
+        for (const step of [1, -1]) {
+          const from = step === 1 ? k : k + 1
+          if (counts[from] <= options.minPerBand) continue
+          counts[k] -= step
+          counts[k + 1] += step
+          if (Math.abs(heightOf(k, counts) - heightOf(k + 1, counts)) < before - 1e-12) {
+            changed = true
+            break
+          }
+          counts[k] += step
+          counts[k + 1] -= step
+        }
+      }
+      if (!changed) break
+    }
   }
-  return { theta, h, capGap }
+
+  const starts: number[] = []
+  let cursor = 0
+  for (const count of counts) {
+    starts.push(cursor)
+    cursor += count
+  }
+  return { theta, h, counts, starts, capGap: Math.max(0, capGap) }
 }
 
 /**
  * Lay the photographs out in courses.
  *
- * Brickwork on a globe. The sphere is cut into bands of latitude and each band
- * is solved to fill its own circumference: the widths of its photographs, at
- * their native aspects, plus one joint of a chosen width per photograph, come
- * to exactly 2π·sin θ. Nothing is sized to its "share" of the sphere and then
- * left to sort itself out with its neighbours, so no two photographs ever lie
- * across each other.
+ * Brickwork on a globe. The sphere is cut into evenly spaced bands of latitude
+ * and each band is filled with whole photographs at their native aspects,
+ * separated by a joint of a chosen width. No photograph is ever sized to its
+ * "share" of the sphere and then left to sort out the difference with its
+ * neighbours, so no two photographs lie across each other anywhere.
  *
- * The number of courses is not a taste decision: it is the largest number that
- * still fits between the poles. Adding one more course would need the sphere to
- * be taller than it is, so the search walks down from an area estimate and
- * takes the first count whose leftover is not negative. That leftover becomes a
- * small white disc at each pole — the one place a band arrangement cannot tile,
- * since a rectangle has corners and the pole has none. At the shipped 162
- * photographs it comes to about 0.09 rad, which sits within a few degrees of
- * the silhouette and is invisible at the working framing.
+ * The course count is chosen, not assumed: every count from a dozen or so down
+ * is fitted, and the one that lets the photographs be *largest* wins. Fewer
+ * courses means taller tiles but more of them crowded into each ring; more
+ * courses means shorter tiles with room to spare. The optimum is a real one and
+ * it moves with the photo count, the joint, and the mix of aspect ratios.
+ *
+ * What is left over becomes a small white disc at each pole — the one place a
+ * band arrangement cannot tile, since a rectangle has corners and a pole does
+ * not. At the shipped framing the poles sit a few degrees *behind* the
+ * silhouette, so that disc is never in view; {@link BandPlan.capGap} is how
+ * much margin there is before it would be.
  */
 export function planBands(
   aspects: readonly number[],
@@ -517,80 +589,39 @@ export function planBands(
 ): BandPlan {
   const n = aspects.length
   const aspectSum = aspects.reduce((a, x) => a + (x > 0 ? x : 1), 0)
-  const meanAspect = aspectSum / Math.max(1, n)
 
-  // Starting guess for the course count. A tile of half-height h and aspect a
-  // covers 4·a·h² steradians, so photographs alone would fill the sphere at
-  // h = √(π/Σa); add the joint and that is the course pitch, and the sphere is
-  // π of colatitude tall. The search below only ever walks down from here.
+  // Upper bound on the search. Photographs alone would fill the sphere at
+  // h = √(π/Σa) — a tile of half-height h and aspect a covers 4·a·h² steradians
+  // — and the joint only makes the courses taller, so no more courses than that
+  // can ever fit.
   const bareHeight = Math.sqrt(Math.PI / Math.max(1e-6, aspectSum))
-  const firstGuess = Math.round(Math.PI / (2 * bareHeight + options.joint)) + 2
+  const ceiling = Math.max(4, Math.round(Math.PI / (2 * bareHeight)) + 4)
 
-  let chosen: { theta: number[]; h: number[]; capGap: number } | null = null
-  let counts: number[] = []
-  let starts: number[] = []
-  let bandCount = 3
-  for (let b = Math.max(3, firstGuess); b >= 3; b--) {
-    const trial = planCounts(aspects, b, options, meanAspect)
-    const solved = solveStack(trial.sums, trial.mins, trial.counts, options)
-    if (solved.capGap >= 0 || b === 3) {
-      chosen = solved
-      counts = trial.counts
-      starts = trial.starts
-      bandCount = b
-      break
+  let best: ReturnType<typeof fitStack> = null
+  let bestCount = 3
+  for (let b = ceiling; b >= 3; b--) {
+    const trial = fitStack(aspects, b, options)
+    if (!trial) continue
+    if (!best || trial.capGap < best.capGap) {
+      best = trial
+      bestCount = b
     }
   }
-  const solved = chosen ?? solveStack([1], [1], [n], options)
+  const solved = best ?? {
+    theta: [Math.PI / 2],
+    h: [0.1],
+    counts: [n],
+    starts: [0],
+    capGap: 0,
+  }
 
-  const bands: Band[] = counts.map((count, k) => ({
-    start: starts[k],
+  const bands: Band[] = solved.counts.map((count, k) => ({
+    start: solved.starts[k],
     count,
     theta: solved.theta[k],
     h: solved.h[k],
   }))
-  return { bands, joint: options.joint, capGap: Math.max(0, solved.capGap), bandCount }
-}
-
-/** Tiles per course and the slice of the placement order each one takes. */
-function planCounts(
-  aspects: readonly number[],
-  bandCount: number,
-  options: BandLayoutOptions,
-  meanAspect: number,
-): { counts: number[]; starts: number[]; sums: number[]; mins: number[] } {
-  // Proportional to circumference — that is the whole reason a course near the
-  // pole holds fewer, narrower frames. The floor keeps the end courses from
-  // thinning to two or three frames rattling around the axis.
-  const pitch = Math.PI / bandCount
-  const tilePitch = 2 * ((pitch - options.joint) / 2) * meanAspect + options.joint
-  const sinFloor = (options.minPerBand * tilePitch) / (2 * Math.PI)
-  const weights: number[] = []
-  for (let k = 0; k < bandCount; k++) {
-    weights.push(Math.max(sinFloor, Math.sin((k + 0.5) * pitch)))
-  }
-  const counts = apportion(aspects.length, weights)
-
-  // Each course takes the next slice of the placement order, so a caller that
-  // sorted its photographs by tone gets that tone as a gradient down the globe.
-  const starts: number[] = []
-  const sums: number[] = []
-  const mins: number[] = []
-  let cursor = 0
-  for (const count of counts) {
-    let sum = 0
-    let min = Number.POSITIVE_INFINITY
-    for (let i = cursor; i < cursor + count; i++) {
-      const a = aspects[i] > 0 ? aspects[i] : 1
-      sum += a
-      if (a < min) min = a
-    }
-    starts.push(cursor)
-    sums.push(sum || 1)
-    mins.push(Number.isFinite(min) ? min : 1)
-    cursor += count
-  }
-  return { counts, starts, sums, mins }
+  return { bands, joint: options.joint, capGap: solved.capGap, bandCount: bestCount }
 }
 
 function layoutBandTiles(
