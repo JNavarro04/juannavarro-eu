@@ -2,12 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Photography by Juan Navarro. A world made of images." />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Juan Navarro — Photography</title>
+    <meta name="description" content="Photography by Juan Navarro. A world made of images." />
+    <meta name="author" content="Juan Navarro" />
+    <meta name="theme-color" content="#f4f6f7" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://juannavarro.eu/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Juan Navarro" />
+    <meta property="og:title" content="Juan Navarro — Photography" />
+    <meta property="og:description" content="Photography by Juan Navarro. A world made of images." />
+    <meta property="og:url" content="https://juannavarro.eu/" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+
+    <!-- Atlas is the single largest asset and gates first paint. Preload only the
+         variant this viewport will actually use; phones must not pay 1.8MB. -->
+    <link rel="preload" as="image" href="/p/atlas-desktop-0.webp" media="(min-width: 769px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/p/atlas-mobile-0.webp" media="(max-width: 768px)" fetchpriority="high" />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      This portfolio renders its gallery with WebGL and needs JavaScript enabled.
+      Reach Juan at <a href="mailto:navarro.frames@gmail.com">navarro.frames@gmail.com</a>.
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
