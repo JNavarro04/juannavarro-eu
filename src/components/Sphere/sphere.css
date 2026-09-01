@@ -1,0 +1,56 @@
+.sphere-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  /* The sphere is the page. Nothing here should ever produce a scrollbar. */
+  overflow: hidden;
+}
+
+.sphere-stage__canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: sphere-fade-in 700ms var(--ease) forwards;
+}
+
+@keyframes sphere-fade-in {
+  to { opacity: 1; }
+}
+
+/* Minimal loading state: a ring the size the sphere is about to be, breathing
+   once a second. No spinner, no text, no layout shift when the photos land. */
+.sphere-stage__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.sphere-stage__ring {
+  width: min(68vw, 68vh);
+  height: min(68vw, 68vh);
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  animation: sphere-breathe 2.4s var(--ease) infinite;
+}
+
+@keyframes sphere-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.985); }
+  50%      { opacity: 0.9;  transform: scale(1); }
+}
+
+.sphere-stage__error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sphere-stage__canvas { opacity: 1; animation: none; }
+  .sphere-stage__ring { animation: none; opacity: 0.6; }
+}

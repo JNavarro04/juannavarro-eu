@@ -1,0 +1,191 @@
+/* ---------------------------------------------------------------------------
+   Info + Contact — one page, two movements.
+   Typography carries this page; there is no ornament, no card, no shadow.
+   --------------------------------------------------------------------------- */
+
+.page {
+  --gutter: clamp(1.5rem, 6vw, 7rem);
+  background: var(--bg);
+}
+
+/* --- shared -------------------------------------------------------------- */
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 clamp(1.25rem, 3vh, 2rem);
+}
+
+/* --- movement one: the statement ---------------------------------------- */
+
+.page__stage {
+  position: relative;
+  min-height: 100svh;
+  padding: clamp(5rem, 10vh, 7.5rem) var(--gutter) 0;
+  gap: clamp(1.25rem, 3.5vh, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.statement {
+  margin: 0;
+  max-width: 20ch;
+  font-weight: 300;
+  font-size: clamp(1.9rem, 1rem + 3.2vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.statement__w {
+  display: inline-block;
+  /* inline-block swallows the trailing space, so the gap must be a margin. */
+  margin-right: 0.26em;
+  opacity: 0;
+  transform: translateY(0.5em);
+  animation: rise 0.9s var(--ease) forwards;
+}
+
+.statement__sub {
+  margin: 0 0 0 auto;
+  max-width: 34ch;
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-align: right;
+  opacity: 0;
+  animation: rise 1s var(--ease) 1.1s forwards;
+}
+
+@keyframes rise {
+  to { opacity: 1; transform: none; }
+}
+
+/* --- the horizon --------------------------------------------------------- */
+
+.horizon {
+  position: relative;
+  margin-top: auto;
+  width: 100%;
+  height: clamp(135px, 21vh, 225px);
+  pointer-events: none;
+}
+
+.horizon__mask {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Feather both ends so frames enter and leave instead of being guillotined. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+
+.horizon__item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  background-color: var(--bg-deep);
+}
+
+/* --- movement two: contact ---------------------------------------------- */
+
+.page__contact {
+  padding: clamp(6rem, 16vh, 11rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  border-top: 1px solid var(--line);
+}
+
+.mailto {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 300;
+  font-size: clamp(1.55rem, 0.4rem + 4.6vw, 5rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.mailto__text {
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.55s var(--ease);
+  padding-bottom: 0.08em;
+}
+
+.mailto:hover .mailto__text,
+.mailto:focus-visible .mailto__text {
+  background-size: 100% 1px;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  margin-top: clamp(3.5rem, 10vh, 7rem);
+  padding-top: clamp(1.5rem, 4vh, 2.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.meta__col { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.meta__k {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+}
+
+.meta__v { font-size: var(--step-0); line-height: 1.45; }
+
+.meta__link {
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s var(--ease);
+}
+.meta__link:hover, .meta__link:focus-visible { border-bottom-color: var(--ink); }
+
+.back {
+  display: inline-block;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  transition: color 0.3s var(--ease);
+}
+.back:hover, .back:focus-visible { color: var(--ink); }
+
+/* --- focus + motion ------------------------------------------------------ */
+
+.page a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement__w, .statement__sub {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .statement { max-width: 100%; }
+  .statement__sub { text-align: left; margin-left: 0; max-width: 100%; }
+  .page__stage { padding-top: clamp(6rem, 14vh, 8rem); }
+}
