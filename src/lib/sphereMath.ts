@@ -12,7 +12,26 @@ export type Vec3 = [number, number, number]
  *  falls into rows — that is what keeps the lattice free of polar clustering. */
 export const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 
+/**
+ * Which arrangement the sphere is laid out with.
+ *
+ * `fibonacci` — one golden-angle spiral, tiles sized to their share of the
+ * sphere. Isotropic, seamless, organic; joints are whatever is left over.
+ *
+ * `bands` — horizontal courses of constant latitude, each solved to fill its
+ * own circumference exactly, so the joint is designed rather than residual.
+ *
+ * See the comparison in {@link BAND_LAYOUT_DEFAULTS} for why the default is
+ * what it is. Changing this line changes the whole surface.
+ */
+export type LayoutMode = 'fibonacci' | 'bands'
+
+/** The shipped arrangement. */
+export const LAYOUT: LayoutMode = 'bands'
+
 export type TileLayoutOptions = {
+  /** Which arrangement to build. Defaults to {@link LAYOUT}. */
+  layout: LayoutMode
   /**
    * How much of its own share of the sphere each tile tries to cover.
    *
@@ -76,11 +95,102 @@ export type TileLayoutOptions = {
 
 /** The tunables. Change these to retune the surface. */
 export const TILE_LAYOUT_DEFAULTS: TileLayoutOptions = {
+  layout: LAYOUT,
   fill: 1.05,
   sizeJitter: 0.06,
   maxTilt: 0,
   alignNeighbours: 6,
   seed: 1337,
+}
+
+/** Tunables for the `bands` arrangement. See {@link BAND_LAYOUT_DEFAULTS}. */
+export type BandLayoutOptions = {
+  /**
+   * The grout, in radians of arc. The same number between two frames in a
+   * course and between two courses, so the white reads as one grid rather than
+   * as two.
+   *
+   * This is the whole point of the arrangement. A course is solved to fill its
+   * own circumference, so what is left between two photographs is a width that
+   * was chosen rather than whatever a lattice happened to leave over. At the
+   * shipped radius one radian of arc is about 306 px, so 0.026 is an eight-pixel
+   * joint at the middle of the disc.
+   */
+  joint: number
+  /** Longitude offset of alternate courses, in mean tile widths. 0.5 is a
+   *  running bond: no vertical joint ever lines up with the one above it. */
+  bond: number
+  /** Deterministic wobble on that offset, same units. Keeps the bond from
+   *  reading as a repeat when six courses are visible at once. */
+  bondJitter: number
+  /** Fewest tiles in a course, so the courses nearest the poles still read as
+   *  courses rather than as two or three lonely frames around the axis. */
+  minPerBand: number
+  /**
+   * Which parallel a course is solved to fill: 0 its centre line, 1 the edge
+   * nearer the pole.
+   *
+   * A course is a band of latitude, and the parallel at its top is shorter than
+   * the parallel through its middle — by h·cot θ, which is nothing at the
+   * equator and everything near the pole. Tiles sized to fill the middle
+   * therefore have nowhere to go at the top, and adjacent frames cross at their
+   * pole-facing corners. Measured at joint 0.026:
+   *
+   *   0.0  87.2% covered, 3.4% double-covered — clean across the middle third
+   *        of the globe, corners crossing in every course above ~60° latitude
+   *   0.5  84.1% covered, 0.6% double-covered
+   *   1.0  80.6% covered, 0.0% double-covered  ← default
+   *
+   * 1 sizes every course to its tightest parallel, so no two photographs touch
+   * anywhere on the sphere. It costs six points of coverage, all of it spent
+   * widening the joint along each course's equator-facing edge — the courses
+   * taper very slightly toward the poles, which is what brickwork on a dome
+   * does anyway. Overlap is the thing being bought out; coverage is the price.
+   */
+  edgeFit: number
+  /**
+   * `uniform` gives every tile in a course the same height and lets the widths
+   * follow each photo's aspect, so a course's top and bottom are two clean
+   * parallels and every joint along it is identical.
+   *
+   * `tallest` gives every tile the same width and lets the heights follow the
+   * aspect, with the course as tall as its squarest photograph. Measured at the
+   * same joint: 66.5% covered against 80.6%, and the loss is not grout — it is
+   * a ragged strip of white above and below every frame that is not the tallest,
+   * which is exactly the missing-photo look the courses were meant to remove.
+   * Kept only so the comparison is reproducible.
+   */
+  heightMode: 'uniform' | 'tallest'
+  /** Seed for the bond wobble and the within-course shuffle. */
+  seed: number
+}
+
+/**
+ * Tunables for the band arrangement.
+ *
+ * Measured on the real 162-photo manifest, 250k sample directions, against the
+ * `fibonacci` lattice this replaced (fill 1.05):
+ *
+ *   fibonacci   88.5% covered, 14.6% double-covered, worst gap 0.067 rad
+ *   bands       80.6% covered,  0.0% double-covered, worst gap 0.099 rad
+ *
+ * The bands cover less and that is the point: nothing overlaps anything, so
+ * every one of the 162 photographs is whole. The eight points of coverage the
+ * lattice had were bought by letting frames lie across each other.
+ */
+export const BAND_LAYOUT_DEFAULTS: BandLayoutOptions = {
+  joint: 0.026,
+  bond: 0.5,
+  bondJitter: 0.18,
+  minPerBand: 4,
+  edgeFit: 1,
+  heightMode: 'uniform',
+  seed: 1337,
+}
+
+/** Overrides accepted by {@link layoutTiles}; `bands` nests its own partial. */
+export type TileLayoutOverrides = Partial<TileLayoutOptions> & {
+  bands?: Partial<BandLayoutOptions>
 }
 
 /** Hard ceiling on a half-extent. The vertex shader takes tan(θ), so θ must stay
@@ -192,6 +302,16 @@ function foldAxisAngle(a: number): number {
  */
 export function layoutTiles(
   aspects: readonly number[],
+  options: TileLayoutOverrides = {},
+): TileLayout {
+  const mode = options.layout ?? TILE_LAYOUT_DEFAULTS.layout
+  return mode === 'bands'
+    ? layoutBandTiles(aspects, { ...BAND_LAYOUT_DEFAULTS, ...options.bands })
+    : layoutFibonacciTiles(aspects, options)
+}
+
+function layoutFibonacciTiles(
+  aspects: readonly number[],
   options: Partial<TileLayoutOptions> = {},
 ): TileLayout {
   const { fill, sizeJitter, maxTilt, alignNeighbours, seed } = {
@@ -273,6 +393,284 @@ export function layoutTiles(
     const h = Math.sqrt((cellSolidAngle * fill) / (4 * aspect)) * jitter
     sizes[i * 2] = Math.min(MAX_HALF_EXTENT, h * aspect)
     sizes[i * 2 + 1] = Math.min(MAX_HALF_EXTENT, h)
+  }
+
+  return { count: n, centers, sizes, rotations, seeds }
+}
+
+/* ── Latitude bands ─────────────────────────────────────────────────────────
+   Brickwork on a globe. Instead of scattering tiles and hoping the leftovers
+   look like grout, the sphere is cut into horizontal courses and each course is
+   solved to fill its own circumference exactly: sum of tile widths, plus one
+   joint per tile, equals 2π·sin θ. The joint stops being an accident.        */
+
+/** One course. `theta` is the colatitude of its centre line, `h` the angular
+ *  half-height shared by every tile in it. */
+export type Band = {
+  /** Index of this course's first photo in the placement order. */
+  start: number
+  count: number
+  theta: number
+  h: number
+}
+
+export type BandPlan = {
+  bands: Band[]
+  /** Grout, radians of arc. Along a course and between courses alike. */
+  joint: number
+  /** Colatitude of the small white disc left at each pole. See {@link planBands}. */
+  capGap: number
+  /** How many courses the sphere ended up with. */
+  bandCount: number
+}
+
+/**
+ * Largest-remainder apportionment: hands out `total` whole items in proportion
+ * to `weights`, and the result always sums to `total` exactly. Rounding each
+ * share independently does not, and a photo lost to rounding is a hole.
+ */
+function apportion(total: number, weights: readonly number[]): number[] {
+  const sum = weights.reduce((a, b) => a + b, 0) || 1
+  const exact = weights.map((w) => (total * w) / sum)
+  const counts = exact.map((x) => Math.floor(x))
+  const order = exact
+    .map((x, i): [number, number] => [i, x - Math.floor(x)])
+    .sort((a, b) => b[1] - a[1])
+  let left = total - counts.reduce((a, b) => a + b, 0)
+  for (let k = 0; left > 0; k++, left--) counts[order[k % order.length][0]] += 1
+  return counts
+}
+
+/**
+ * Solve one candidate stack of `bandCount` courses.
+ *
+ * Everything here is forced except one number. The tiles per course follow the
+ * circumference; the tile height follows from the course having to fill that
+ * circumference with photographs of fixed aspect plus one joint each; the joint
+ * is given. So the courses come out however tall they come out, they are laid
+ * from the north pole downward with a joint between each pair, and whatever is
+ * left of the pole-to-pole span is split between the two poles. That leftover —
+ * `capGap` — is the only free number, and it is the reason nothing has to
+ * overlap: the arrangement is never asked to close a gap it cannot close.
+ *
+ * A negative `capGap` means the courses do not fit; the caller tries fewer.
+ */
+function solveStack(
+  sums: readonly number[],
+  mins: readonly number[],
+  counts: readonly number[],
+  options: BandLayoutOptions,
+): { theta: number[]; h: number[]; capGap: number } {
+  const b = counts.length
+  const theta: number[] = counts.map((_, k) => ((k + 0.5) * Math.PI) / b)
+  const h: number[] = counts.map(() => Math.PI / (4 * b))
+  let capGap = 0
+  for (let pass = 0; pass < 80; pass++) {
+    for (let k = 0; k < b; k++) {
+      // `uniform` shares one height and lets widths follow the aspects;
+      // `tallest` shares one width, so the course is as tall as its squarest.
+      const denom =
+        options.heightMode === 'uniform' ? 2 * sums[k] : 2 * counts[k] * mins[k]
+      // The parallel this course has to fit on. Pulling it toward the pole-side
+      // edge is what stops adjacent frames crossing at their top corners.
+      const toward = theta[k] < Math.PI / 2 ? -1 : 1
+      const fit = theta[k] + toward * options.edgeFit * h[k]
+      const circumference = 2 * Math.PI * Math.sin(Math.max(1e-4, Math.min(Math.PI - 1e-4, fit)))
+      const raw = (circumference - counts[k] * options.joint) / Math.max(1e-6, denom)
+      // Damped: `fit` moves with h, so an undamped step can ring near the poles.
+      h[k] = Math.max(1e-4, 0.5 * h[k] + 0.5 * raw)
+    }
+    let stacked = 0
+    for (const hk of h) stacked += 2 * hk
+    capGap = (Math.PI - stacked - (b - 1) * options.joint) / 2
+    let t = capGap
+    for (let k = 0; k < b; k++) {
+      theta[k] = t + h[k]
+      t += 2 * h[k] + options.joint
+    }
+  }
+  return { theta, h, capGap }
+}
+
+/**
+ * Lay the photographs out in courses.
+ *
+ * Brickwork on a globe. The sphere is cut into bands of latitude and each band
+ * is solved to fill its own circumference: the widths of its photographs, at
+ * their native aspects, plus one joint of a chosen width per photograph, come
+ * to exactly 2π·sin θ. Nothing is sized to its "share" of the sphere and then
+ * left to sort itself out with its neighbours, so no two photographs ever lie
+ * across each other.
+ *
+ * The number of courses is not a taste decision: it is the largest number that
+ * still fits between the poles. Adding one more course would need the sphere to
+ * be taller than it is, so the search walks down from an area estimate and
+ * takes the first count whose leftover is not negative. That leftover becomes a
+ * small white disc at each pole — the one place a band arrangement cannot tile,
+ * since a rectangle has corners and the pole has none. At the shipped 162
+ * photographs it comes to about 0.09 rad, which sits within a few degrees of
+ * the silhouette and is invisible at the working framing.
+ */
+export function planBands(
+  aspects: readonly number[],
+  options: BandLayoutOptions = BAND_LAYOUT_DEFAULTS,
+): BandPlan {
+  const n = aspects.length
+  const aspectSum = aspects.reduce((a, x) => a + (x > 0 ? x : 1), 0)
+  const meanAspect = aspectSum / Math.max(1, n)
+
+  // Starting guess for the course count. A tile of half-height h and aspect a
+  // covers 4·a·h² steradians, so photographs alone would fill the sphere at
+  // h = √(π/Σa); add the joint and that is the course pitch, and the sphere is
+  // π of colatitude tall. The search below only ever walks down from here.
+  const bareHeight = Math.sqrt(Math.PI / Math.max(1e-6, aspectSum))
+  const firstGuess = Math.round(Math.PI / (2 * bareHeight + options.joint)) + 2
+
+  let chosen: { theta: number[]; h: number[]; capGap: number } | null = null
+  let counts: number[] = []
+  let starts: number[] = []
+  let bandCount = 3
+  for (let b = Math.max(3, firstGuess); b >= 3; b--) {
+    const trial = planCounts(aspects, b, options, meanAspect)
+    const solved = solveStack(trial.sums, trial.mins, trial.counts, options)
+    if (solved.capGap >= 0 || b === 3) {
+      chosen = solved
+      counts = trial.counts
+      starts = trial.starts
+      bandCount = b
+      break
+    }
+  }
+  const solved = chosen ?? solveStack([1], [1], [n], options)
+
+  const bands: Band[] = counts.map((count, k) => ({
+    start: starts[k],
+    count,
+    theta: solved.theta[k],
+    h: solved.h[k],
+  }))
+  return { bands, joint: options.joint, capGap: Math.max(0, solved.capGap), bandCount }
+}
+
+/** Tiles per course and the slice of the placement order each one takes. */
+function planCounts(
+  aspects: readonly number[],
+  bandCount: number,
+  options: BandLayoutOptions,
+  meanAspect: number,
+): { counts: number[]; starts: number[]; sums: number[]; mins: number[] } {
+  // Proportional to circumference — that is the whole reason a course near the
+  // pole holds fewer, narrower frames. The floor keeps the end courses from
+  // thinning to two or three frames rattling around the axis.
+  const pitch = Math.PI / bandCount
+  const tilePitch = 2 * ((pitch - options.joint) / 2) * meanAspect + options.joint
+  const sinFloor = (options.minPerBand * tilePitch) / (2 * Math.PI)
+  const weights: number[] = []
+  for (let k = 0; k < bandCount; k++) {
+    weights.push(Math.max(sinFloor, Math.sin((k + 0.5) * pitch)))
+  }
+  const counts = apportion(aspects.length, weights)
+
+  // Each course takes the next slice of the placement order, so a caller that
+  // sorted its photographs by tone gets that tone as a gradient down the globe.
+  const starts: number[] = []
+  const sums: number[] = []
+  const mins: number[] = []
+  let cursor = 0
+  for (const count of counts) {
+    let sum = 0
+    let min = Number.POSITIVE_INFINITY
+    for (let i = cursor; i < cursor + count; i++) {
+      const a = aspects[i] > 0 ? aspects[i] : 1
+      sum += a
+      if (a < min) min = a
+    }
+    starts.push(cursor)
+    sums.push(sum || 1)
+    mins.push(Number.isFinite(min) ? min : 1)
+    cursor += count
+  }
+  return { counts, starts, sums, mins }
+}
+
+function layoutBandTiles(
+  aspects: readonly number[],
+  options: BandLayoutOptions,
+): TileLayout {
+  const n = aspects.length
+  const centers = new Float32Array(n * 3)
+  const sizes = new Float32Array(n * 2)
+  const rotations = new Float32Array(n)
+  const seeds = new Float32Array(n)
+
+  const rng = makeRng(options.seed)
+  for (let i = 0; i < n; i++) seeds[i] = rng()
+
+  const plan = planBands(aspects, options)
+
+  for (let k = 0; k < plan.bands.length; k++) {
+    const band = plan.bands[k]
+    const { start, count, theta, h } = band
+    if (count === 0) continue
+
+    // Order within a course. The slice arrives sorted by tone, which also means
+    // sorted by whatever the shoot happened to be — so the panoramas and the
+    // portraits arrive in clumps. A seeded shuffle inside the course spreads
+    // the shapes without moving a single photograph out of its tonal band.
+    const order = shuffledIndices(count, options.seed + k * 7919).map((j) => start + j)
+
+    // `uniform`: one height, widths follow each photo's aspect.
+    // `tallest`:  one width, set by the course's squarest photo, heights follow.
+    let minAspect = Number.POSITIVE_INFINITY
+    for (const i of order) {
+      const a = aspects[i] > 0 ? aspects[i] : 1
+      if (a < minAspect) minAspect = a
+    }
+    if (!Number.isFinite(minAspect)) minAspect = 1
+    const widths = order.map((i) => {
+      const a = aspects[i] > 0 ? aspects[i] : 1
+      return options.heightMode === 'uniform' ? h * a : h * minAspect
+    })
+    let arc = 0
+    for (const w of widths) arc += 2 * w
+    arc += count * plan.joint
+
+    // Longitude is handed out in proportion to arc, normalised so the ring
+    // closes on itself exactly. Anything the solver could not spend — the slack
+    // that `edgeFit` leaves along a course's equator-facing edge — comes back
+    // here as extra longitude per joint, spread evenly over every joint in the
+    // course. The remainder widens the grout; it never lets a frame overrun.
+    const perArc = (2 * Math.PI) / Math.max(1e-6, arc)
+
+    // Running bond, so no vertical joint sits above another. The wobble is
+    // there because five courses of perfect half-offset start to read as a
+    // pattern rather than as masonry.
+    const meanTile = (2 * Math.PI) / count
+    const wobble = options.bondJitter * (rng() * 2 - 1)
+    const lambda0 = (options.bond * (k % 2) + wobble) * meanTile
+
+    let cum = 0
+    for (let t = 0; t < order.length; t++) {
+      const i = order[t]
+      const w = widths[t]
+      const lambda = lambda0 + perArc * (cum + w + plan.joint / 2)
+      cum += 2 * w + plan.joint
+
+      const sinT = Math.sin(theta)
+      centers[i * 3] = sinT * Math.cos(lambda)
+      centers[i * 3 + 1] = Math.cos(theta)
+      centers[i * 3 + 2] = sinT * Math.sin(lambda)
+
+      // Height follows the width for `tallest`, so those tiles keep their aspect
+      // and leave the course's slack above and below them.
+      const a = aspects[i] > 0 ? aspects[i] : 1
+      const tileH = options.heightMode === 'uniform' ? h : w / a
+      sizes[i * 2] = Math.min(MAX_HALF_EXTENT, w)
+      sizes[i * 2 + 1] = Math.min(MAX_HALF_EXTENT, tileH)
+      // Every tile square on the local horizon: that is what makes a course
+      // read as a course.
+      rotations[i] = 0
+    }
   }
 
   return { count: n, centers, sizes, rotations, seeds }

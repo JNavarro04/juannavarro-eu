@@ -3,107 +3,108 @@
  *  SCROLL CHOREOGRAPHY — the maths
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Pure numbers. No DOM, no React, no three.js — everything here is a function of
- * (scroll position, viewport, a longitude the visitor has steered by hand), so
- * the whole choreography is deterministic and exactly reversible: scrolling back
- * up retraces the way down, because nothing accumulates.
+ * Pure numbers. No DOM, no React, no three.js.
  *
- * The three phases, off one normalised progress value:
+ * One gesture, one meaning:
  *
- *   0 ────────────── 0.5 ─────────────────────────────────────────────── 1
- *   │  1. approach    │  2. the stop  │  3. travel across the surface
- *   │  camera dollies │  a held beat  │  latitude sweeps, longitude spirals
- *   │  ambient spin   │  at a distance│  drag / swipe steers longitude
- *   │  eases to zero  │  that still   │  directly on top of it
- *   │  landing text   │  shows the    │
- *   │  fades out      │  curvature    │
+ *   SCROLL  →  DISTANCE.  Down dollies the camera in toward the surface, up
+ *              dollies back out to the resting globe. That is *all* scrolling
+ *              does. The scroll range ends where the zoom ends: at the bottom of
+ *              the document the camera is at the stop and there is nothing left
+ *              to scroll.
  *
- * The stop sits at exactly {@link STOP_PROGRESS} even though the two phases are
- * given very different amounts of real scrolling — {@link scrollLengths} maps
- * pixels to progress piecewise, so the constants below stay readable.
+ *   DRAG    →  ORBIT.     Pointer and touch drag rotate the sphere in both axes,
+ *              with momentum on release, so every photograph is reachable.
+ *
+ * Both are absolute functions of their input, so both are exactly reversible:
+ * nothing here accumulates, and scrolling back up retraces the way down.
  *
  * Camera model (mirrors PhotoSphere): the camera sits on +Z at
- * `baseDistance * distanceScale`, looking down −Z, and never re-targets. The
- * sphere is rotated under it — `spin` about its own Y (longitude), `tilt` about
- * world X (latitude). So travelling the surface is a rotation, never a pan.
+ * `baseDistance * distanceScale` looking down −Z, and never re-targets. The
+ * sphere turns under it — `spin` about its own Y (longitude), `tilt` about world
+ * X (latitude) — so orbiting is rotation, never a pan.
  */
 import { distanceForViewportFraction } from './sphereMath'
 
-/* ── Tuning ──────────────────────────────────────────────────────────────── */
+/* ── Tuning: the zoom ────────────────────────────────────────────────────── */
 
-/** Scroll, in viewport heights, that the phase-1 dolly consumes. */
-export const APPROACH_SCREENS = 1.8
-
-/** Scroll, in viewport heights, that is held perfectly still at the stop. */
-export const STOP_DWELL_SCREENS = 0.3
-
-/** Scroll, in viewport heights, of phase-3 travel across the sphere's surface. */
-export const SURFACE_SCREENS = 18
-
-/** Normalised progress at which the dolly ends and surface travel begins. */
-export const STOP_PROGRESS = 0.5
+/** Scroll, in viewport heights, that the whole dolly consumes. The document is
+ *  exactly this much taller than the viewport, and not one pixel more. */
+export const ZOOM_SCREENS = 2
 
 /** Sphere's angular radius at the stop, as a multiple of the viewport's
- *  half-diagonal. Above 1 the silhouette overflows the frame, so the curvature
- *  is read from the foreshortening in the corners rather than from an edge. */
+ *  half-diagonal. At 1 the silhouette passes through the corners: the frame is
+ *  filled edge to edge, and the curvature is read from the foreshortening that
+ *  runs from a photograph facing you dead centre to one nearly edge-on in the
+ *  corner. Raise it to press closer; the picture flattens as you do. */
 export const STOP_COVER = 1
 
 /** Never closer than this, in sphere radii. The client chose to stay outside the
  *  shell looking at the convex face; this is the guard rail that keeps it so. */
 export const MIN_STOP_DISTANCE = 1.34
 
-/** Never further than this at the stop, in sphere radii. Stops very tall, narrow
- *  viewports from calling it a day while the sphere is still a distant marble. */
+/** Never further than this at the stop, in sphere radii. Stops a very tall,
+ *  narrow viewport from calling it a day while the sphere is still a marble. */
 export const MAX_STOP_DISTANCE = 3.1
 
-/** Latitude the surface phase starts at, radians. Positive looks north. */
-export const LATITUDE_TOP = 1.05
-
-/** Latitude the surface phase ends at, radians. */
-export const LATITUDE_BOTTOM = -1.05
-
-/** Full turns of longitude across the whole surface phase. Latitude sweeps once
- *  while this spirals, so the path wraps the globe; more turns close the gaps
- *  between passes at the cost of a faster sideways drift per screen scrolled. */
-export const SURFACE_TURNS = 3.5
-
-/** Fraction of the approach spent before the latitude roll starts. Early scroll
- *  is a pure dolly; the roll settles in with the stop. */
-export const APPROACH_TILT_DELAY = 0.28
-
-/** Fraction of the approach after which the ambient spin has fully stopped. */
+/** Fraction of the zoom after which the ambient spin has fully stopped. */
 export const SPIN_FADE_END = 0.8
 
-/** Fraction of the approach after which the landing text is gone. */
+/** Fraction of the zoom after which the landing text is gone. */
 export const TEXT_FADE_END = 0.22
 
-/** Damping rate for scroll progress, s⁻¹. Lower = heavier, more expensive.
- *  ~5 gives a 200ms time constant: it lags the finger and settles without wobble. */
+/** Progress past which the page counts as zoomed in: the way-back-out control
+ *  appears, and on touch the scroll lock is armed. */
+export const ZOOMED_PROGRESS = 0.82
+
+/** Progress at which touch scrolling hands over to orbiting. Effectively "the
+ *  document is at its bottom", so the lock never swallows a scroll that would
+ *  still have moved the camera. */
+export const LOCK_PROGRESS = 0.995
+
+/* ── Tuning: the feel ────────────────────────────────────────────────────── */
+
+/** Damping rate for scroll progress, s⁻¹. ~5 is a 180ms time constant: it lags
+ *  the wheel just enough to feel weighty and settles without wobble. */
 export const PROGRESS_DAMPING = 5.5
 
-/** Damping rate for hand-steered longitude, s⁻¹. Higher than the scroll: direct
- *  manipulation should feel attached to the pointer. */
-export const LONGITUDE_DAMPING = 9
+/** Damping rate for the orbit, s⁻¹. Higher than the scroll — direct
+ *  manipulation should feel attached to the finger, not towed by it. */
+export const ORBIT_DAMPING = 12
 
-/** How far a gesture must travel before it is committed to an axis, px. */
-export const GESTURE_LOCK_PX = 8
+/** How far the orbit may travel from the equator, radians. Just short of π/2:
+ *  the poles come fully into view without the axis passing through the camera. */
+export const ORBIT_LATITUDE_LIMIT = 1.45
 
-/** How much more horizontal than vertical a touch gesture must be to steer the
- *  sphere instead of scrolling the page. Above 1 so vertical scroll always wins ties. */
-export const GESTURE_HORIZONTAL_BIAS = 1.2
+/** Decay rate of a flick, s⁻¹. The glide is over in roughly a second. */
+export const FLICK_DECAY = 3.4
 
-/** Radians of longitude per pixel of horizontal wheel/trackpad delta, as a
- *  multiple of the drag rate. Trackpad deltas are coarser than pointer motion. */
-export const WHEEL_LONGITUDE_GAIN = 0.8
+/** Fastest a flick may throw the sphere, radians per second. */
+export const FLICK_MAX_SPEED = 7
 
-/** How much more horizontal than vertical a wheel event must be before it steers
- *  the sphere. A two-finger vertical scroll on a trackpad carries a pixel or two
- *  of sideways noise in almost every event; without this the sphere would drift
- *  west all the way down the page. */
-export const WHEEL_HORIZONTAL_BIAS = 1.2
+/** Below this speed, radians per second, the glide is over. */
+export const FLICK_MIN_SPEED = 0.02
 
-/** Horizontal wheel deltas below this many pixels are noise, not intent. */
-export const WHEEL_DEAD_ZONE_PX = 0.6
+/** A pointer that has been still this long, ms, releases without a flick. */
+export const FLICK_IDLE_MS = 90
+
+/** How much the EMA of pointer velocity trusts the newest sample. */
+export const FLICK_SMOOTHING = 0.32
+
+/* ── Tuning: gestures ────────────────────────────────────────────────────── */
+
+/** Movement below this, px, is a click, not a drag. Under it the pointer is
+ *  never captured and the click reaches the page untouched — which is what lets
+ *  a lightbox hook clicks on the photographs. */
+export const CLICK_SLOP_PX = 6
+
+/** Clicks are swallowed for this long, ms, after a real drag ends, so releasing
+ *  a spin does not also open the photograph under the finger. */
+export const CLICK_SUPPRESS_MS = 400
+
+/** Growth in the distance between two fingers, px, that means "pinch out" and
+ *  takes a locked, zoomed-in phone back to the globe. */
+export const PINCH_OUT_PX = 64
 
 /* ── Small helpers ───────────────────────────────────────────────────────── */
 
@@ -169,7 +170,7 @@ export type ViewGeometryInput = {
  * a 16:9 desktop needs the camera much closer than a 390px phone before the
  * sphere covers the corners, and a fixed `distanceScale` would frame the two
  * completely differently. Deriving it means one constant (STOP_COVER) describes
- * the same look on every screen.
+ * the same look on every screen — 1440×900, 390×844 and 740×360 alike.
  */
 export function viewGeometry(input: ViewGeometryInput): ViewGeometry {
   const { width, height, radius, fovDegrees, viewportFraction } = input
@@ -207,8 +208,8 @@ export function viewGeometry(input: ViewGeometryInput): ViewGeometry {
  * `rayAngle` off the view axis lands on. Beyond the silhouette it returns the
  * silhouette's own angle, so it is defined for every ray.
  *
- * This is what makes hand-steering feel like direct manipulation: the surface
- * under the pointer can follow the pointer only if we know how many radians of
+ * This is what makes orbiting feel like direct manipulation: the photograph
+ * under the finger can follow the finger only if we know how many radians of
  * sphere a pixel is worth at the current distance.
  */
 export function surfacePolarAngle(distance: number, rayAngle: number, radius: number): number {
@@ -225,124 +226,98 @@ export function visibleLongitudeHalfAngle(geom: ViewGeometry, distance: number):
   return surfacePolarAngle(distance, Math.atan(geom.tanHalfFovX), geom.radius)
 }
 
+/** Half the latitude visible down the screen at this camera distance. */
+export function visibleLatitudeHalfAngle(geom: ViewGeometry, distance: number): number {
+  return surfacePolarAngle(distance, Math.atan(geom.tanHalfFovY), geom.radius)
+}
+
 /* ── Scroll → progress ───────────────────────────────────────────────────── */
 
 export type ScrollLengths = {
-  /** Pixels of scroll spent on phase 1. */
-  approachPx: number
-  /** Pixels of scroll spent holding still at the stop. */
-  dwellPx: number
-  /** Pixels of scroll spent travelling the surface. */
-  travelPx: number
-  /** Total scrollable distance the choreography wants. */
-  totalPx: number
-  /** Height the spacer must have to *offer* that much scrolling. */
+  /** Scroll distance the zoom wants, px. */
+  zoomPx: number
+  /** Height the spacer must have to offer exactly that much scrolling, px. */
   spacerPx: number
-  /** Share of phase 3 that is the dwell. */
-  dwellFraction: number
 }
 
 export function scrollLengths(viewportHeight: number): ScrollLengths {
   const h = Math.max(1, viewportHeight)
-  const approachPx = APPROACH_SCREENS * h
-  const dwellPx = STOP_DWELL_SCREENS * h
-  const travelPx = SURFACE_SCREENS * h
-  const totalPx = approachPx + dwellPx + travelPx
+  const zoomPx = ZOOM_SCREENS * h
   return {
-    approachPx,
-    dwellPx,
-    travelPx,
-    totalPx,
+    zoomPx,
     // A document can only be scrolled by its height *minus one viewport* — the
-    // last screenful is already on screen. Without this the final screen of the
-    // choreography would be unreachable.
-    spacerPx: totalPx + h,
-    dwellFraction: dwellPx / Math.max(1, dwellPx + travelPx),
+    // last screenful is already on screen. Without this the zoom would end one
+    // screen before the bottom and leave dead scrolling behind it.
+    spacerPx: zoomPx + h,
   }
 }
 
 /**
- * Normalised progress from a raw scroll position.
+ * Normalised progress, 0 at the resting globe and 1 at the stop.
  *
- * Piecewise so that the stop lands on {@link STOP_PROGRESS} exactly while the
- * two phases keep wildly different physical lengths — one and a bit screens to
- * dive in, eighteen to walk the globe.
+ * The range is the smaller of what the zoom asked for and what the document can
+ * actually scroll. That second term is what guarantees the two things the page
+ * must never do: end the zoom early and leave dead scrolling underneath it, or
+ * run out of document before the zoom finishes. It also absorbs a phone's URL
+ * bar sliding away, which changes `innerHeight` by ~10% without the document
+ * changing at all.
  */
-export function progressFromScroll(scrollY: number, lengths: ScrollLengths): number {
-  const y = Math.max(0, scrollY)
-  if (y <= lengths.approachPx) {
-    return STOP_PROGRESS * clamp01(y / Math.max(1, lengths.approachPx))
-  }
-  const after = (y - lengths.approachPx) / Math.max(1, lengths.dwellPx + lengths.travelPx)
-  return STOP_PROGRESS + (1 - STOP_PROGRESS) * clamp01(after)
+export function progressFromScroll(
+  scrollY: number,
+  documentHeight: number,
+  viewportHeight: number,
+  lengths: ScrollLengths,
+): number {
+  const scrollable = Math.max(1, documentHeight - viewportHeight)
+  const range = Math.max(1, Math.min(lengths.zoomPx, scrollable))
+  return clamp01(Math.max(0, scrollY) / range)
 }
 
 /* ── Progress → drive ────────────────────────────────────────────────────── */
 
+/** Where the visitor has orbited to, radians. Entirely hand-driven. */
+export type OrbitState = {
+  /** Longitude, unbounded — the sphere turns as far as you keep dragging. */
+  longitude: number
+  /** Latitude, clamped to ±{@link ORBIT_LATITUDE_LIMIT}. */
+  latitude: number
+}
+
 export type ChoreoFrame = {
   /** Straight into `sphereDrive.distanceScale`. */
   distanceScale: number
-  /** Straight into `sphereDrive.spin` — longitude, hand-steering included. */
+  /** Straight into `sphereDrive.spin` — longitude. */
   spin: number
   /** Straight into `sphereDrive.tilt` — latitude. */
   tilt: number
   /** Straight into `sphereDrive.spinScale` — 1 at rest, 0 by the stop. */
   spinScale: number
-  /** 1 → 0 across the first breath of the approach. For landing text. */
+  /** 1 → 0 across the first breath of the zoom. For landing text. */
   textOpacity: number
-  /** Which phase this frame belongs to. */
-  phase: 'approach' | 'surface'
 }
 
 /**
  * The whole choreography, as one pure function.
  *
- * `progress` is the damped value, not the raw one. `longitude` is the radians
- * the visitor has dragged/swiped by hand, added on top of the spiral.
+ * `progress` is the damped value, not the raw one, and `orbit` is the damped
+ * orbit. Distance comes from scrolling and only from scrolling; rotation comes
+ * from dragging and only from dragging.
  */
 export function frameForProgress(
   progress: number,
-  longitude: number,
+  orbit: OrbitState,
   geom: ViewGeometry,
-  lengths: ScrollLengths,
 ): ChoreoFrame {
   const p = clamp01(progress)
-
-  if (p <= STOP_PROGRESS) {
-    // ── Phase 1: approach ────────────────────────────────────────────────
-    const t = p / STOP_PROGRESS
-    const eased = smootherstep(t)
-
-    // Geometric, not linear: a dolly that covers 3× in distance reads as a
-    // constant-rate zoom only if the *ratio* moves at a constant rate.
-    const distanceScale = Math.pow(geom.stopScale, eased)
-
-    const tiltT = smootherstep((t - APPROACH_TILT_DELAY) / (1 - APPROACH_TILT_DELAY))
-
-    return {
-      distanceScale,
-      spin: longitude,
-      tilt: LATITUDE_TOP * tiltT,
-      spinScale: 1 - smootherstep(t / SPIN_FADE_END),
-      textOpacity: 1 - smootherstep(t / TEXT_FADE_END),
-      phase: 'approach',
-    }
-  }
-
-  // ── Phases 2 and 3: the held beat, then travel ─────────────────────────
-  const afterStop = (p - STOP_PROGRESS) / (1 - STOP_PROGRESS)
-  const travel = clamp01((afterStop - lengths.dwellFraction) / (1 - lengths.dwellFraction))
+  const eased = smootherstep(p)
 
   return {
-    // The dolly is over. Every further pixel of scroll is surface, not depth.
-    distanceScale: geom.stopScale,
-    // Negative so the surface drifts left and new photographs arrive from the
-    // right — the direction a page of content moves when you scroll down.
-    spin: longitude - SURFACE_TURNS * 2 * Math.PI * travel,
-    // Top to bottom: the surface rises, new photographs arrive from below.
-    tilt: mix(LATITUDE_TOP, LATITUDE_BOTTOM, travel),
-    spinScale: 0,
-    textOpacity: 0,
-    phase: 'surface',
+    // Geometric, not linear: a dolly that covers 3× in distance reads as a
+    // constant-rate zoom only if the *ratio* moves at a constant rate.
+    distanceScale: Math.pow(geom.stopScale, eased),
+    spin: orbit.longitude,
+    tilt: clamp(orbit.latitude, -ORBIT_LATITUDE_LIMIT, ORBIT_LATITUDE_LIMIT),
+    spinScale: 1 - smootherstep(p / SPIN_FADE_END),
+    textOpacity: 1 - smootherstep(p / TEXT_FADE_END),
   }
 }

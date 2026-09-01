@@ -8,27 +8,48 @@
  * full-viewport stage and nothing to scroll.
  */
 
-/* The stage is pinned rather than sticky: `position: sticky` would need a
+/* ── The pin ──────────────────────────────────────────────────────────────
+   The stage is pinned rather than sticky: `position: sticky` would need a
    parent taller than the viewport, and Landing's <main> is 100dvh by design.
    This is the one rule that reaches into a class owned by Sphere/ — it changes
-   where that element sits, never how it draws. */
+   where that element sits, never how it draws.
+
+   `inset: 0` and nothing else. Sizing a fixed element with viewport *units* is
+   the classic way to get a white band on a phone: `height: 100dvh` is the
+   dynamic viewport, which shrinks when the URL bar slides in, while the fixed
+   element's containing block stays the full layout viewport — so the canvas
+   comes up short and the page shows through underneath it. The insets always
+   describe exactly the viewport, at every URL-bar position, on every platform.
+   `width`/`height: auto` are there to beat the `100%`s in sphere.css, which
+   would otherwise win over the insets. */
 html.choreo-on .sphere-stage {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100dvh;
+  width: auto;
+  height: auto;
+  /* Under the nav (z-index 100) and under the cue, above the spacer. */
+  z-index: 0;
 }
 
 /* tokens.css sets `canvas { touch-action: none }`, which is right for a canvas
    you drag but wrong for one you scroll past: on a phone it would swallow every
-   vertical swipe. Vertical panning goes back to the platform; horizontal is
-   ours, and pinch-zoom stays with the user, who may well need it.
+   vertical swipe. Vertical panning goes back to the platform; pinch-zoom stays
+   with the user, who may well need it.
 
    Note the descendant selector rather than `.sphere-stage__canvas`: r3f puts
    the className on a wrapper <div> and the real <canvas> is two levels inside
    it, so the class alone would never outrank the bare `canvas` rule. */
 html.choreo-on .sphere-stage canvas {
   touch-action: pan-y pinch-zoom;
+}
+
+/* ── The lock ─────────────────────────────────────────────────────────────
+   Armed only on coarse pointers, and only once the document has no scrollable
+   distance left. From here a touch drag orbits the sphere instead of trying to
+   scroll a page that cannot scroll; the way back out is the button below. */
+html.choreo-on.choreo-locked .sphere-stage,
+html.choreo-on.choreo-locked .sphere-stage canvas {
+  touch-action: none;
 }
 
 html.choreo-on.choreo-dragging,
@@ -38,12 +59,14 @@ html.choreo-on.choreo-dragging .sphere-stage canvas {
 }
 
 /* ── The scroll range ─────────────────────────────────────────────────────
-   An empty block whose height is the whole choreography. The component sets it
-   in pixels from the measured viewport; the inline vh value it starts with is
-   there so a reload half way down the page is not clamped back to the top
-   before the first effect runs. */
+   An empty block, behind the pinned stage, whose height is the whole zoom. The
+   component sets it in pixels from the measured viewport; the inline vh value
+   it starts with is there so a reload half way down the page is not clamped
+   back to the top before the first effect runs. It is never visible: the stage
+   covers the viewport at every scroll position. */
 .choreo__spacer {
   width: 100%;
+  max-width: 100%;
   pointer-events: none;
   /* The document never reflows here, so scroll anchoring has nothing useful to
      do and can only ever fight the choreography. */
@@ -72,6 +95,7 @@ html.choreo-on .choreo__cue {
   font-size: var(--step--1);
   letter-spacing: 0.22em;
   text-transform: uppercase;
+  white-space: nowrap;
   pointer-events: none;
   /* The component writes `opacity` inline every time the rounded value changes;
      this is only the value before the first frame lands. */
@@ -92,11 +116,67 @@ html.choreo-on .choreo__cue {
 }
 
 @keyframes choreo-cue-fall {
-  0%       { transform: scaleY(0.35); opacity: 0.2; }
-  45%      { transform: scaleY(1);    opacity: 1; }
-  100%     { transform: scaleY(1);    opacity: 0; }
+  0%   { transform: scaleY(0.35); opacity: 0.2; }
+  45%  { transform: scaleY(1);    opacity: 1; }
+  100% { transform: scaleY(1);    opacity: 0; }
+}
+
+/* ── The way back out ─────────────────────────────────────────────────────
+   The visitor must never be stranded in the zoomed-in state — on a phone the
+   page has no scroll left to take them out, so this is the way out, and it is
+   a real <button>: keyboard reachable, screen-reader announced. `visibility`
+   rather than `display` so it also leaves the tab order while hidden. */
+.choreo__back {
+  display: none;
+}
+
+html.choreo-on .choreo__back {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1.5rem, 4vh, 3rem);
+  z-index: 3;
+  display: block;
+  transform: translateX(-50%) translateY(0.35rem);
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 340ms var(--ease),
+    transform 340ms var(--ease),
+    visibility 0s linear 340ms;
+}
+
+html.choreo-on.choreo-zoomed .choreo__back {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+  transition-delay: 0s, 0s, 0s;
+}
+
+html.choreo-on .choreo__back:hover {
+  border-color: var(--ink-faint);
+}
+
+html.choreo-on .choreo__back:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .choreo__cue-line { animation: none; }
+  html.choreo-on .choreo__back { transition: none; }
 }
