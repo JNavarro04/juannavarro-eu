@@ -15,10 +15,11 @@ const INITIALS = SITE.name
  * vector-effect="non-scaling-stroke", so the line weight is exactly 1.5 CSS px
  * whatever size the box is rendered at — the two icons can never drift apart.
  *
- * Optical sizing: a filled-corner square reads bigger than a wide rectangle at
- * equal box size, so the Instagram frame is held to 17.3 × 17.3 while the
- * envelope is let out to 19.4 × 15.2. Both land on ~17.2 units of √area, which
- * is what the eye actually compares.
+ * Optical sizing: a square reads bigger and heavier than a wide rectangle at the
+ * same box size, and the envelope's flap adds ink the square does not have. So
+ * the Instagram frame is held to 17.3 × 17.3 while the envelope is let out only
+ * as far as 18.8 × 14.8 — measured side by side at 5× and at 1:1, that is where
+ * neither one starts to dominate.
  */
 
 function InstagramMark() {
@@ -42,9 +43,10 @@ function InstagramMark() {
         rx="4.9"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx="12" cy="12" r="3.55" vectorEffect="non-scaling-stroke" />
-      {/* Zero-length round-capped dash: renders as a true 1.9px dot at any scale. */}
-      <path d="M16.95 7.05h.01" strokeWidth={1.9} vectorEffect="non-scaling-stroke" />
+      <circle cx="12" cy="12" r="3.8" vectorEffect="non-scaling-stroke" />
+      {/* Zero-length round-capped dash: renders as a true 1.9px dot at any scale.
+          Sits 0.9px clear of the frame and the lens on all three sides. */}
+      <path d="M17.15 6.85h.01" strokeWidth={1.9} vectorEffect="non-scaling-stroke" />
     </svg>
   )
 }
@@ -63,16 +65,16 @@ function EnvelopeMark() {
       focusable="false"
     >
       <rect
-        x="2.3"
-        y="4.4"
-        width="19.4"
-        height="15.2"
-        rx="2.4"
+        x="2.6"
+        y="4.6"
+        width="18.8"
+        height="14.8"
+        rx="2.35"
         vectorEffect="non-scaling-stroke"
       />
-      {/* Flap creases start just inside the top corner arcs so the caps kiss the
-          outline instead of poking through it. */}
-      <path d="M3.5 5.35 12 11.9l8.5-6.55" vectorEffect="non-scaling-stroke" />
+      {/* Flap creases start just inside the top corner arcs, so the round caps
+          merge into the outline instead of poking out past it. */}
+      <path d="M3.85 5.5 12 11.2l8.15-5.7" vectorEffect="non-scaling-stroke" />
     </svg>
   )
 }
