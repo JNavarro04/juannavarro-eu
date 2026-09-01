@@ -54,7 +54,7 @@ export type PhotoSphereProps = {
   atlasSize: number
   /** Overrides the shared {@link sphereDrive} singleton. See sphereDrive.ts. */
   drive?: Partial<SphereDrive>
-  /** When true the sphere is built and lit but never moves. */
+  /** When true the sphere is drawn exactly as usual but never moves. */
   reducedMotion?: boolean
 }
 

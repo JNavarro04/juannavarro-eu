@@ -10,16 +10,20 @@
 .sphere-stage__canvas {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  animation: sphere-fade-in 700ms var(--ease) forwards;
+  /* The transparent start is the keyframe's, not the element's: if animations
+     are disabled or unsupported the sphere is simply visible, never stuck at
+     zero opacity. */
+  animation: sphere-fade-in 700ms var(--ease) both;
 }
 
 @keyframes sphere-fade-in {
-  to { opacity: 1; }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Minimal loading state: a ring the size the sphere is about to be, breathing
-   once a second. No spinner, no text, no layout shift when the photos land. */
+   slowly. No spinner, no text, no layout shift when the photos land.
+   The 68 below tracks VIEWPORT_FRACTION in PhotoSphere.tsx — change both. */
 .sphere-stage__loading {
   position: absolute;
   inset: 0;
@@ -51,6 +55,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sphere-stage__canvas { opacity: 1; animation: none; }
+  .sphere-stage__canvas { animation: none; }
   .sphere-stage__ring { animation: none; opacity: 0.6; }
 }

@@ -9,3 +9,8 @@ photos-src/
 
 # Generated derivatives (rebuild with `npm run assets`)
 public/p/
+
+# Secrets
+.env
+.env.local
+.env*.local

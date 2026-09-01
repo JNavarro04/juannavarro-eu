@@ -14,12 +14,15 @@
  *     sphereDrive.distanceScale = 1 + t * 1.4         // dolly the camera back
  *     sphereDrive.offsetY = -t * 0.8                  // slide it up the page
  *     sphereDrive.spinScale = 1 - t                   // let the ambient spin die
- *     sphereDrive.spin += 0                           // …or drive rotation directly
+ *     sphereDrive.spin = t * Math.PI                  // …and steer it yourself
  *   }, { passive: true })
  *
  * Everything is absolute, not incremental — write the value you want for this
  * frame. Interpolate on your side (a lerp toward a target in a rAF loop reads
  * much better than raw scroll position). `resetSphereDrive()` puts it back.
+ *
+ * Under `prefers-reduced-motion` the ambient spin stops but the drive is still
+ * read every frame, so scroll-linked motion remains yours to decide about.
  *
  * If you would rather stay declarative, `<PhotoSphere drive={…} />` and
  * `<SphereStage drive={…} />` accept a partial of this shape and will use that

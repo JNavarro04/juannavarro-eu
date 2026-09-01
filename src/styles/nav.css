@@ -1,5 +1,11 @@
 /* Sits over a live WebGL canvas on `/`, so it must stay legible without a bar. */
 .nav {
+  /* One knob: the glyph size. The touch padding solves itself from it so the
+     tap target is always exactly 44px, at every breakpoint. */
+  --nav-glyph: 18px;
+  --nav-touch: 44px;
+  --nav-pad: calc((var(--nav-touch) - var(--nav-glyph)) / 2);
+
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 100;
@@ -22,7 +28,14 @@
   white-space: nowrap;
 }
 
-.nav__links { display: flex; gap: clamp(1rem, 2.5vw, 2.25rem); }
+.nav__mark-short { display: none; }
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2.25rem);
+  white-space: nowrap;
+}
 
 .nav__link {
   position: relative;
@@ -51,14 +64,83 @@
 .nav__link.is-active::after,
 .nav__link.active::after { transform: scaleX(1); }
 
-.nav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 2px; }
+/* ── Icon links ─────────────────────────────────────────────────────────── */
+
+.nav__icons {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  /* No gap: the 44px targets butt up against each other and never overlap, so
+     neither icon can steal the other's taps on a phone. The visible spacing is
+     each link's own padding. */
+  gap: 0;
+  /* Pull the invisible touch padding back out of the layout so the *glyphs*,
+     not their hit boxes, line up with the text links and the page's right
+     margin. */
+  margin-inline: calc(var(--nav-pad) * -1);
+}
+
+.nav__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  padding: var(--nav-pad);
+  /* …and out of the row height, so the nav keeps its original rhythm. */
+  margin-block: calc(var(--nav-pad) * -1);
+  transition: color 0.3s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav__glyph {
+  display: block;
+  width: var(--nav-glyph);
+  height: var(--nav-glyph);
+  /* The uppercase text next to it is optically centred a hair above its line
+     box; match it so the row reads as one baseline. */
+  transform: translateY(-0.5px);
+}
+
+.nav__icon:hover,
+.nav__icon:focus-visible,
+.nav__icon.active { color: var(--ink); }
+
+/* ── Focus ─────────────────────────────────────────────────────────────── */
+
+.nav__mark:focus-visible,
+.nav__link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* An outline on the icon link would ring the whole 44px target. Draw the ring
+   snugly around the glyph instead. */
+.nav__icon:focus-visible { outline: none; }
+.nav__icon:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--nav-pad) - 6px);
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+}
+
+/* ── Narrow ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 520px) {
-  .nav { font-size: 0.66rem; letter-spacing: 0.08em; }
+  .nav { font-size: 0.66rem; letter-spacing: 0.08em; --nav-glyph: 16px; }
   .nav__mark { font-size: 0.66rem; }
   .nav__links { gap: 0.85rem; }
 }
 
+@media (max-width: 359px) {
+  .nav__mark-full { display: none; }
+  .nav__mark-short { display: inline; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .nav__link::after { transition: none; }
+  .nav__link::after,
+  .nav__link,
+  .nav__icon { transition: none; }
 }
