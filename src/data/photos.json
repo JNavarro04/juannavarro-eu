@@ -1,0 +1,5337 @@
+{
+  "generated": "2026-09-01T21:54:02.767Z",
+  "count": 162,
+  "atlas": {
+    "desktop": {
+      "sheet": 4096,
+      "tile": 320
+    },
+    "mobile": {
+      "sheet": 2048,
+      "tile": 160
+    }
+  },
+  "photos": [
+    {
+      "id": "editada-2-building-within-a-frame",
+      "src": "EDITADA - 2 building within a frame.jpg",
+      "w": 12000,
+      "h": 8000,
+      "aspect": 1.5,
+      "color": "#525048",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/3.5",
+        "shutter": "1/250s",
+        "iso": 320,
+        "date": "2025-10-26"
+      },
+      "mid": "/p/mid/editada-2-building-within-a-frame.webp",
+      "full": "/p/full/editada-2-building-within-a-frame.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "grandes-vias-40x20-3",
+      "src": "Grandes Vias 40x20-3.jpg",
+      "w": 2160,
+      "h": 1080,
+      "aspect": 2,
+      "color": "#6c6c6c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Canon Canon EOS 100D",
+        "lens": "Canon EF-S 18-55mm f/3.5-5.6 III",
+        "focal": "23mm",
+        "aperture": "f/13",
+        "shutter": "1/40s",
+        "iso": 200,
+        "date": "2016-05-29"
+      },
+      "mid": "/p/mid/grandes-vias-40x20-3.webp",
+      "full": "/p/full/grandes-vias-40x20-3.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.039063
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.039063
+        }
+      }
+    },
+    {
+      "id": "img-0243",
+      "src": "IMG_0243.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#939497",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-01-28"
+      },
+      "mid": "/p/mid/img-0243.webp",
+      "full": "/p/full/img-0243.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-0294",
+      "src": "IMG_0294.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#42332f",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-01-28"
+      },
+      "mid": "/p/mid/img-0294.webp",
+      "full": "/p/full/img-0294.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-0412",
+      "src": "IMG_0412.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#46463f",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-01-29"
+      },
+      "mid": "/p/mid/img-0412.webp",
+      "full": "/p/full/img-0412.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-0413",
+      "src": "IMG_0413.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#41403b",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-01-29"
+      },
+      "mid": "/p/mid/img-0413.webp",
+      "full": "/p/full/img-0413.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-0428-2",
+      "src": "IMG_0428 2.JPG",
+      "w": 1261,
+      "h": 1692,
+      "aspect": 0.7453,
+      "color": "#5e5849",
+      "orientation": "portrait",
+      "exif": {
+        "date": "2023-01-29"
+      },
+      "mid": "/p/mid/img-0428-2.webp",
+      "full": "/p/full/img-0428-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.000977,
+          "w": 0.058105,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.001953,
+          "w": 0.058105,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-0428",
+      "src": "IMG_0428.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#635d4d",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-01-29"
+      },
+      "mid": "/p/mid/img-0428.webp",
+      "full": "/p/full/img-0428.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-0535",
+      "src": "IMG_0535.JPG",
+      "w": 1920,
+      "h": 1280,
+      "aspect": 1.5,
+      "color": "#4a321e",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2023-04-11"
+      },
+      "mid": "/p/mid/img-0535.webp",
+      "full": "/p/full/img-0535.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "img-2231",
+      "src": "IMG_2231.JPG",
+      "w": 4320,
+      "h": 3240,
+      "aspect": 1.3333,
+      "color": "#7c7f8d",
+      "orientation": "landscape",
+      "exif": {
+        "date": "2025-07-22"
+      },
+      "mid": "/p/mid/img-2231.webp",
+      "full": "/p/full/img-2231.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-2232",
+      "src": "IMG_2232.JPG",
+      "w": 2160,
+      "h": 1431,
+      "aspect": 1.5094,
+      "color": "#808a86",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "LEICA CAMERA AG LEICA T (Typ 701)",
+        "lens": "Vario-Elmar T 1:3.5-5.6 / 18-56 ASPH.",
+        "focal": "22mm",
+        "aperture": "f/11",
+        "shutter": "1/320s",
+        "iso": 100,
+        "date": "2025-07-16"
+      },
+      "mid": "/p/mid/img-2232.webp",
+      "full": "/p/full/img-2232.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-2233",
+      "src": "IMG_2233.JPG",
+      "w": 4320,
+      "h": 2752,
+      "aspect": 1.5698,
+      "color": "#86805e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "LEICA CAMERA AG LEICA T (Typ 701)",
+        "lens": "Vario-Elmar T 1:3.5-5.6 / 18-56 ASPH.",
+        "focal": "23mm",
+        "aperture": "f/9",
+        "shutter": "1/250s",
+        "iso": 100,
+        "date": "2025-07-16"
+      },
+      "mid": "/p/mid/img-2233.webp",
+      "full": "/p/full/img-2233.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.049805
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.049805
+        }
+      }
+    },
+    {
+      "id": "img-2234",
+      "src": "IMG_2234.JPG",
+      "w": 2862,
+      "h": 4320,
+      "aspect": 0.6625,
+      "color": "#6f8446",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "LEICA CAMERA AG LEICA T (Typ 701)",
+        "lens": "Vario-Elmar T 1:3.5-5.6 / 18-56 ASPH.",
+        "focal": "45mm",
+        "aperture": "f/7.1",
+        "shutter": "1/125s",
+        "iso": 100,
+        "date": "2025-07-16"
+      },
+      "mid": "/p/mid/img-2234.webp",
+      "full": "/p/full/img-2234.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.060059,
+          "v": 0.000977,
+          "w": 0.051758,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.062012,
+          "v": 0.001953,
+          "w": 0.051758,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-2857",
+      "src": "IMG_2857.jpeg",
+      "w": 2083,
+      "h": 1179,
+      "aspect": 1.7668,
+      "color": "#adad85",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-2857.webp",
+      "full": "/p/full/img-2857.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.044189
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.044434
+        }
+      }
+    },
+    {
+      "id": "img-4529",
+      "src": "IMG_4529.JPG",
+      "w": 1440,
+      "h": 1080,
+      "aspect": 1.3333,
+      "color": "#606974",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "12mm",
+        "aperture": "f/5",
+        "shutter": "1/400s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4529.webp",
+      "full": "/p/full/img-4529.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-4530",
+      "src": "IMG_4530.JPG",
+      "w": 1080,
+      "h": 1440,
+      "aspect": 0.75,
+      "color": "#505a71",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "8mm",
+        "aperture": "f/4",
+        "shutter": "1/320s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4530.webp",
+      "full": "/p/full/img-4530.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.112793,
+          "v": 0.000977,
+          "w": 0.058594,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.115723,
+          "v": 0.001953,
+          "w": 0.058594,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-4537",
+      "src": "IMG_4537.JPG",
+      "w": 1080,
+      "h": 1440,
+      "aspect": 0.75,
+      "color": "#506172",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "14mm",
+        "aperture": "f/5",
+        "shutter": "1/500s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4537.webp",
+      "full": "/p/full/img-4537.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.172363,
+          "v": 0.000977,
+          "w": 0.058594,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.17627,
+          "v": 0.001953,
+          "w": 0.058594,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-4539",
+      "src": "IMG_4539.JPG",
+      "w": 1440,
+      "h": 1080,
+      "aspect": 1.3333,
+      "color": "#444f6d",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "19mm",
+        "aperture": "f/5.6",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4539.webp",
+      "full": "/p/full/img-4539.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-4541",
+      "src": "IMG_4541.JPG",
+      "w": 1440,
+      "h": 1080,
+      "aspect": 1.3333,
+      "color": "#5a5c6d",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "7mm",
+        "aperture": "f/4",
+        "shutter": "1/640s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4541.webp",
+      "full": "/p/full/img-4541.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-4547",
+      "src": "IMG_4547.JPG",
+      "w": 1440,
+      "h": 1080,
+      "aspect": 1.3333,
+      "color": "#ae9382",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "6mm",
+        "aperture": "f/3.5",
+        "shutter": "1/100s",
+        "iso": 100,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4547.webp",
+      "full": "/p/full/img-4547.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-4551",
+      "src": "IMG_4551.JPG",
+      "w": 1440,
+      "h": 1080,
+      "aspect": 1.3333,
+      "color": "#9a8768",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "SONY DSC-WX220",
+        "focal": "4mm",
+        "aperture": "f/3.3",
+        "shutter": "1/30s",
+        "iso": 1600,
+        "date": "2026-04-01"
+      },
+      "mid": "/p/mid/img-4551.webp",
+      "full": "/p/full/img-4551.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.058594
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.058594
+        }
+      }
+    },
+    {
+      "id": "img-4574",
+      "src": "IMG_4574.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#8e9593",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4574.webp",
+      "full": "/p/full/img-4574.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4576",
+      "src": "IMG_4576.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#88837a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4576.webp",
+      "full": "/p/full/img-4576.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4577",
+      "src": "IMG_4577.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#6e5f4e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4577.webp",
+      "full": "/p/full/img-4577.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4579",
+      "src": "IMG_4579.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#4a4231",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4579.webp",
+      "full": "/p/full/img-4579.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4581",
+      "src": "IMG_4581.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#78756f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4581.webp",
+      "full": "/p/full/img-4581.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4582",
+      "src": "IMG_4582.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#a09387",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4582.webp",
+      "full": "/p/full/img-4582.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4584",
+      "src": "IMG_4584.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#797a7f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4584.webp",
+      "full": "/p/full/img-4584.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4585",
+      "src": "IMG_4585.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#b2947a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4585.webp",
+      "full": "/p/full/img-4585.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4586",
+      "src": "IMG_4586.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#7d5944",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4586.webp",
+      "full": "/p/full/img-4586.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4587",
+      "src": "IMG_4587.JPG",
+      "w": 2075,
+      "h": 3130,
+      "aspect": 0.6629,
+      "color": "#ab9885",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4587.webp",
+      "full": "/p/full/img-4587.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.231934,
+          "v": 0.000977,
+          "w": 0.051758,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.236816,
+          "v": 0.001953,
+          "w": 0.051758,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-4588",
+      "src": "IMG_4588.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#a2978c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4588.webp",
+      "full": "/p/full/img-4588.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4589",
+      "src": "IMG_4589.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#6e614a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4589.webp",
+      "full": "/p/full/img-4589.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4590",
+      "src": "IMG_4590.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#958f87",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4590.webp",
+      "full": "/p/full/img-4590.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4591",
+      "src": "IMG_4591.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#72685a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4591.webp",
+      "full": "/p/full/img-4591.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4592",
+      "src": "IMG_4592.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#9a8575",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4592.webp",
+      "full": "/p/full/img-4592.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4593",
+      "src": "IMG_4593.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#a4988f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4593.webp",
+      "full": "/p/full/img-4593.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4594",
+      "src": "IMG_4594.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#887f73",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4594.webp",
+      "full": "/p/full/img-4594.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.567139,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.579102,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4595",
+      "src": "IMG_4595.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#49463b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4595.webp",
+      "full": "/p/full/img-4595.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4597",
+      "src": "IMG_4597.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#a58d76",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4597.webp",
+      "full": "/p/full/img-4597.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4599",
+      "src": "IMG_4599.JPG",
+      "w": 2075,
+      "h": 3130,
+      "aspect": 0.6629,
+      "color": "#70614f",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4599.webp",
+      "full": "/p/full/img-4599.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.284668,
+          "v": 0.000977,
+          "w": 0.051758,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.290527,
+          "v": 0.001953,
+          "w": 0.051758,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "img-4600",
+      "src": "IMG_4600.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#86847a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4600.webp",
+      "full": "/p/full/img-4600.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4603",
+      "src": "IMG_4603.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#876d5a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4603.webp",
+      "full": "/p/full/img-4603.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4604",
+      "src": "IMG_4604.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#9b8b7e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4604.webp",
+      "full": "/p/full/img-4604.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4605",
+      "src": "IMG_4605.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#7c7065",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4605.webp",
+      "full": "/p/full/img-4605.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4665",
+      "src": "IMG_4665.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#969696",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4665.webp",
+      "full": "/p/full/img-4665.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4666",
+      "src": "IMG_4666.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#5c5c5c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4666.webp",
+      "full": "/p/full/img-4666.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4668",
+      "src": "IMG_4668.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#7b7b7b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4668.webp",
+      "full": "/p/full/img-4668.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4669",
+      "src": "IMG_4669.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#646464",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4669.webp",
+      "full": "/p/full/img-4669.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4670",
+      "src": "IMG_4670.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#505050",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4670.webp",
+      "full": "/p/full/img-4670.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4671",
+      "src": "IMG_4671.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#797979",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4671.webp",
+      "full": "/p/full/img-4671.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.619873,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.632813,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4674",
+      "src": "IMG_4674.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#7c7c7c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4674.webp",
+      "full": "/p/full/img-4674.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-4675",
+      "src": "IMG_4675.JPG",
+      "w": 3130,
+      "h": 2075,
+      "aspect": 1.5084,
+      "color": "#6c6c6c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "NORITSU KOKI EZ Controller"
+      },
+      "mid": "/p/mid/img-4675.webp",
+      "full": "/p/full/img-4675.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.051758
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.051758
+        }
+      }
+    },
+    {
+      "id": "img-5331",
+      "src": "IMG_5331.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#6b625a",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5331.webp",
+      "full": "/p/full/img-5331.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5335",
+      "src": "IMG_5335.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#68615c",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5335.webp",
+      "full": "/p/full/img-5335.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5339",
+      "src": "IMG_5339.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#5a5a56",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5339.webp",
+      "full": "/p/full/img-5339.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5342",
+      "src": "IMG_5342.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#71716e",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5342.webp",
+      "full": "/p/full/img-5342.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5344",
+      "src": "IMG_5344.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#4d5250",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5344.webp",
+      "full": "/p/full/img-5344.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5347",
+      "src": "IMG_5347.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#5f564f",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5347.webp",
+      "full": "/p/full/img-5347.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.080078,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.082031,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5348",
+      "src": "IMG_5348.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#5f564b",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5348.webp",
+      "full": "/p/full/img-5348.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5352",
+      "src": "IMG_5352.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#717771",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5352.webp",
+      "full": "/p/full/img-5352.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5355",
+      "src": "IMG_5355.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#53493d",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5355.webp",
+      "full": "/p/full/img-5355.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5358",
+      "src": "IMG_5358.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#64605a",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5358.webp",
+      "full": "/p/full/img-5358.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5363",
+      "src": "IMG_5363.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#5a6350",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5363.webp",
+      "full": "/p/full/img-5363.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5367",
+      "src": "IMG_5367.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#646560",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5367.webp",
+      "full": "/p/full/img-5367.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5370",
+      "src": "IMG_5370.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#858680",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5370.webp",
+      "full": "/p/full/img-5370.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5371",
+      "src": "IMG_5371.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#5d6262",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5371.webp",
+      "full": "/p/full/img-5371.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5374",
+      "src": "IMG_5374.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#828782",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5374.webp",
+      "full": "/p/full/img-5374.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5376",
+      "src": "IMG_5376.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#7b7f7e",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5376.webp",
+      "full": "/p/full/img-5376.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5377",
+      "src": "IMG_5377.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#6e6f70",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5377.webp",
+      "full": "/p/full/img-5377.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5378",
+      "src": "IMG_5378.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#696b68",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5378.webp",
+      "full": "/p/full/img-5378.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.139648,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.142578,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5380",
+      "src": "IMG_5380.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#91918b",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5380.webp",
+      "full": "/p/full/img-5380.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5382",
+      "src": "IMG_5382.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#9ca099",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5382.webp",
+      "full": "/p/full/img-5382.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5385",
+      "src": "IMG_5385.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#767b78",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5385.webp",
+      "full": "/p/full/img-5385.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5386",
+      "src": "IMG_5386.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#999084",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5386.webp",
+      "full": "/p/full/img-5386.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5387",
+      "src": "IMG_5387.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#9ba2a0",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5387.webp",
+      "full": "/p/full/img-5387.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5388",
+      "src": "IMG_5388.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#969081",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5388.webp",
+      "full": "/p/full/img-5388.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5392",
+      "src": "IMG_5392.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#8c9096",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5392.webp",
+      "full": "/p/full/img-5392.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5395",
+      "src": "IMG_5395.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#4d3f35",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5395.webp",
+      "full": "/p/full/img-5395.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5405",
+      "src": "IMG_5405.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#6f6f64",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5405.webp",
+      "full": "/p/full/img-5405.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5408",
+      "src": "IMG_5408.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#7e826f",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5408.webp",
+      "full": "/p/full/img-5408.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5410",
+      "src": "IMG_5410.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#7c806e",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5410.webp",
+      "full": "/p/full/img-5410.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5437",
+      "src": "IMG_5437.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#877252",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5437.webp",
+      "full": "/p/full/img-5437.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.193848,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.197754,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5443",
+      "src": "IMG_5443.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#79705e",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5443.webp",
+      "full": "/p/full/img-5443.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "img-5444",
+      "src": "IMG_5444.JPG",
+      "w": 3578,
+      "h": 2433,
+      "aspect": 1.4706,
+      "color": "#6b6d68",
+      "orientation": "landscape",
+      "exif": {},
+      "mid": "/p/mid/img-5444.webp",
+      "full": "/p/full/img-5444.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.053223
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.053223
+        }
+      }
+    },
+    {
+      "id": "p1005033",
+      "src": "P1005033.jpg",
+      "w": 2160,
+      "h": 1440,
+      "aspect": 1.5,
+      "color": "#4e5148",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/7.1",
+        "shutter": "1/200s",
+        "iso": 640,
+        "date": "2025-08-28"
+      },
+      "mid": "/p/mid/p1005033.webp",
+      "full": "/p/full/p1005033.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1005050",
+      "src": "P1005050.jpg",
+      "w": 2160,
+      "h": 926,
+      "aspect": 2.3326,
+      "color": "#67685c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/7.1",
+        "shutter": "1/200s",
+        "iso": 640,
+        "date": "2025-08-28"
+      },
+      "mid": "/p/mid/p1005050.webp",
+      "full": "/p/full/p1005050.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.033447
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.033691
+        }
+      }
+    },
+    {
+      "id": "p1005052",
+      "src": "P1005052.jpg",
+      "w": 1440,
+      "h": 2160,
+      "aspect": 0.6667,
+      "color": "#4e4f41",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/7.1",
+        "shutter": "1/200s",
+        "iso": 640,
+        "date": "2025-08-28"
+      },
+      "mid": "/p/mid/p1005052.webp",
+      "full": "/p/full/p1005052.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.337402,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.344238,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1005081",
+      "src": "P1005081.jpg",
+      "w": 2160,
+      "h": 926,
+      "aspect": 2.3326,
+      "color": "#54544f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/8",
+        "shutter": "1/320s",
+        "iso": 640,
+        "date": "2025-08-28"
+      },
+      "mid": "/p/mid/p1005081.webp",
+      "full": "/p/full/p1005081.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.033447
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.033691
+        }
+      }
+    },
+    {
+      "id": "p1005139",
+      "src": "P1005139.jpg",
+      "w": 2160,
+      "h": 1274,
+      "aspect": 1.6954,
+      "color": "#58554a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "40mm",
+        "aperture": "f/8",
+        "shutter": "1/500s",
+        "iso": 800,
+        "date": "2025-08-28"
+      },
+      "mid": "/p/mid/p1005139.webp",
+      "full": "/p/full/p1005139.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.046143
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.045898
+        }
+      }
+    },
+    {
+      "id": "p1005409",
+      "src": "P1005409.jpg",
+      "w": 2160,
+      "h": 1440,
+      "aspect": 1.5,
+      "color": "#857b6d",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "46mm",
+        "aperture": "f/7.1",
+        "shutter": "1/400s",
+        "iso": 640,
+        "date": "2025-08-29"
+      },
+      "mid": "/p/mid/p1005409.webp",
+      "full": "/p/full/p1005409.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1005669",
+      "src": "P1005669.jpg",
+      "w": 2160,
+      "h": 1296,
+      "aspect": 1.6667,
+      "color": "#777368",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "25mm",
+        "aperture": "f/7.1",
+        "shutter": "1/640s",
+        "iso": 640,
+        "date": "2025-08-29"
+      },
+      "mid": "/p/mid/p1005669.webp",
+      "full": "/p/full/p1005669.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.046875
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.046875
+        }
+      }
+    },
+    {
+      "id": "p1005674",
+      "src": "P1005674.jpg",
+      "w": 2160,
+      "h": 926,
+      "aspect": 2.3326,
+      "color": "#6c6a5a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/7.1",
+        "shutter": "1/800s",
+        "iso": 640,
+        "date": "2025-08-29"
+      },
+      "mid": "/p/mid/p1005674.webp",
+      "full": "/p/full/p1005674.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.033447
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.033691
+        }
+      }
+    },
+    {
+      "id": "p1005781",
+      "src": "P1005781.jpg",
+      "w": 1440,
+      "h": 2160,
+      "aspect": 0.6667,
+      "color": "#6d6d66",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "55mm",
+        "aperture": "f/5.5",
+        "shutter": "1/400s",
+        "iso": 640,
+        "date": "2025-08-29"
+      },
+      "mid": "/p/mid/p1005781.webp",
+      "full": "/p/full/p1005781.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.390381,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.398438,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1006017",
+      "src": "P1006017.jpg",
+      "w": 2160,
+      "h": 926,
+      "aspect": 2.3326,
+      "color": "#5c605a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/2000s",
+        "iso": 800,
+        "date": "2025-08-30"
+      },
+      "mid": "/p/mid/p1006017.webp",
+      "full": "/p/full/p1006017.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.033447
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.033691
+        }
+      }
+    },
+    {
+      "id": "p1006020",
+      "src": "P1006020.jpg",
+      "w": 2160,
+      "h": 1440,
+      "aspect": 1.5,
+      "color": "#5b634e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/2000s",
+        "iso": 800,
+        "date": "2025-08-30"
+      },
+      "mid": "/p/mid/p1006020.webp",
+      "full": "/p/full/p1006020.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.248047,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.25293,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1016053",
+      "src": "P1016053.jpg",
+      "w": 2160,
+      "h": 1440,
+      "aspect": 1.5,
+      "color": "#606b65",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/2500s",
+        "iso": 800,
+        "date": "2025-08-30"
+      },
+      "mid": "/p/mid/p1016053.webp",
+      "full": "/p/full/p1016053.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1016085",
+      "src": "P1016085.jpg",
+      "w": 2160,
+      "h": 926,
+      "aspect": 2.3326,
+      "color": "#5d6864",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/2500s",
+        "iso": 800,
+        "date": "2025-08-30"
+      },
+      "mid": "/p/mid/p1016085.webp",
+      "full": "/p/full/p1016085.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.672607,
+          "w": 0.078125,
+          "h": 0.033447
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.686523,
+          "w": 0.078125,
+          "h": 0.033691
+        }
+      }
+    },
+    {
+      "id": "p1016112",
+      "src": "P1016112.jpg",
+      "w": 1440,
+      "h": 2160,
+      "aspect": 0.6667,
+      "color": "#627470",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 640,
+        "date": "2025-08-30"
+      },
+      "mid": "/p/mid/p1016112.webp",
+      "full": "/p/full/p1016112.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.443359,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.452637,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1018350",
+      "src": "P1018350.jpg",
+      "w": 4000,
+      "h": 6000,
+      "aspect": 0.6667,
+      "color": "#9b9488",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 500,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018350.webp",
+      "full": "/p/full/p1018350.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.496338,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.506836,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1018415",
+      "src": "P1018415.jpg",
+      "w": 5176,
+      "h": 3451,
+      "aspect": 1.4999,
+      "color": "#a29889",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 640,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018415.webp",
+      "full": "/p/full/p1018415.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1018450",
+      "src": "P1018450.jpg",
+      "w": 5510,
+      "h": 3673,
+      "aspect": 1.5001,
+      "color": "#89817a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 640,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018450.webp",
+      "full": "/p/full/p1018450.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1018506",
+      "src": "P1018506.jpg",
+      "w": 4000,
+      "h": 6000,
+      "aspect": 0.6667,
+      "color": "#7f7a76",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "43mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 250,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018506.webp",
+      "full": "/p/full/p1018506.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.549316,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.561035,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1018512",
+      "src": "P1018512.jpg",
+      "w": 3795,
+      "h": 5692,
+      "aspect": 0.6667,
+      "color": "#989496",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "43mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 250,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018512.webp",
+      "full": "/p/full/p1018512.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.602295,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.615234,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1018533",
+      "src": "P1018533.jpg",
+      "w": 9635,
+      "h": 6423,
+      "aspect": 1.5001,
+      "color": "#766d69",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "53mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 100,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018533.webp",
+      "full": "/p/full/p1018533.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1018583",
+      "src": "P1018583.jpg",
+      "w": 24000,
+      "h": 16000,
+      "aspect": 1.5,
+      "color": "#60775d",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/7.1",
+        "shutter": "1/500s",
+        "iso": 640,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018583.webp",
+      "full": "/p/full/p1018583.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1018757",
+      "src": "P1018757.jpg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#546a68",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/6.3",
+        "shutter": "1/500s",
+        "iso": 1600,
+        "date": "2025-11-01"
+      },
+      "mid": "/p/mid/p1018757.webp",
+      "full": "/p/full/p1018757.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019542",
+      "src": "P1019542.jpg",
+      "w": 7532,
+      "h": 5021,
+      "aspect": 1.5001,
+      "color": "#796f36",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/6.3",
+        "shutter": "1/400s",
+        "iso": 1000,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019542.webp",
+      "full": "/p/full/p1019542.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019543",
+      "src": "P1019543.jpg",
+      "w": 9338,
+      "h": 6225,
+      "aspect": 1.5001,
+      "color": "#654d34",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4",
+        "shutter": "1/400s",
+        "iso": 200,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019543.webp",
+      "full": "/p/full/p1019543.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019635",
+      "src": "P1019635.jpg",
+      "w": 3519,
+      "h": 2346,
+      "aspect": 1.5,
+      "color": "#8a988e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019635.webp",
+      "full": "/p/full/p1019635.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019657",
+      "src": "P1019657.jpg",
+      "w": 4621,
+      "h": 3081,
+      "aspect": 1.4998,
+      "color": "#73766b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019657.webp",
+      "full": "/p/full/p1019657.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019678",
+      "src": "P1019678.jpg",
+      "w": 2297,
+      "h": 3446,
+      "aspect": 0.6666,
+      "color": "#989e99",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019678.webp",
+      "full": "/p/full/p1019678.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.655273,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.669434,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1019687",
+      "src": "P1019687.jpg",
+      "w": 2005,
+      "h": 3007,
+      "aspect": 0.6668,
+      "color": "#81796f",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019687.webp",
+      "full": "/p/full/p1019687.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.708252,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.723633,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1019807",
+      "src": "P1019807.jpg",
+      "w": 3025,
+      "h": 4537,
+      "aspect": 0.6667,
+      "color": "#818e90",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019807.webp",
+      "full": "/p/full/p1019807.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.76123,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.777832,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1019809",
+      "src": "P1019809.jpg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#94a8b9",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019809.webp",
+      "full": "/p/full/p1019809.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019902-2",
+      "src": "P1019902 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#96a07e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/9",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1019902-2.webp",
+      "full": "/p/full/p1019902-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.302246,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.308105,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019902",
+      "src": "P1019902.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#96a07e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/9",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1019902.webp",
+      "full": "/p/full/p1019902.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019910",
+      "src": "P1019910.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#96a082",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/9",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1019910.webp",
+      "full": "/p/full/p1019910.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019911",
+      "src": "P1019911.jpg",
+      "w": 1545,
+      "h": 2317,
+      "aspect": 0.6668,
+      "color": "#818280",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 125,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019911.webp",
+      "full": "/p/full/p1019911.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.814209,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.832031,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1019925-2",
+      "src": "P1019925 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#929c7e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "24mm",
+        "aperture": "f/9",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1019925-2.webp",
+      "full": "/p/full/p1019925-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019925",
+      "src": "P1019925.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#929c7e",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "24mm",
+        "aperture": "f/9",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1019925.webp",
+      "full": "/p/full/p1019925.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1019943",
+      "src": "P1019943.jpg",
+      "w": 1795,
+      "h": 2693,
+      "aspect": 0.6665,
+      "color": "#918a77",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 100,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1019943.webp",
+      "full": "/p/full/p1019943.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.867188,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.88623,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1020006-2",
+      "src": "P1020006 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#879483",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "44mm",
+        "aperture": "f/7.1",
+        "shutter": "1/400s",
+        "iso": 250,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1020006-2.webp",
+      "full": "/p/full/p1020006-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020006",
+      "src": "P1020006.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#879483",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "44mm",
+        "aperture": "f/7.1",
+        "shutter": "1/400s",
+        "iso": 250,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1020006.webp",
+      "full": "/p/full/p1020006.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020013",
+      "src": "P1020013.jpg",
+      "w": 4967,
+      "h": 3311,
+      "aspect": 1.5002,
+      "color": "#653713",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 6400,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1020013.webp",
+      "full": "/p/full/p1020013.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020025",
+      "src": "P1020025.jpg",
+      "w": 5898,
+      "h": 3932,
+      "aspect": 1.5,
+      "color": "#614131",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 35/F1.8",
+        "focal": "35mm",
+        "aperture": "f/4.5",
+        "shutter": "1/200s",
+        "iso": 6400,
+        "date": "2025-11-03"
+      },
+      "mid": "/p/mid/p1020025.webp",
+      "full": "/p/full/p1020025.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020028",
+      "src": "P1020028.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#818e6d",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/7.1",
+        "shutter": "1/250s",
+        "iso": 125,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1020028.webp",
+      "full": "/p/full/p1020028.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020046-2",
+      "src": "P1020046 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#829a71",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "23mm",
+        "aperture": "f/4.5",
+        "shutter": "1/250s",
+        "iso": 125,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1020046-2.webp",
+      "full": "/p/full/p1020046-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020046",
+      "src": "P1020046.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#829a71",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "23mm",
+        "aperture": "f/4.5",
+        "shutter": "1/250s",
+        "iso": 125,
+        "date": "2026-07-28"
+      },
+      "mid": "/p/mid/p1020046.webp",
+      "full": "/p/full/p1020046.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020110",
+      "src": "P1020110.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#868783",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/6.3",
+        "shutter": "1/400s",
+        "iso": 100,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020110.webp",
+      "full": "/p/full/p1020110.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.355225,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.362305,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020117",
+      "src": "P1020117.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#abb2b1",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/6.3",
+        "shutter": "1/320s",
+        "iso": 200,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020117.webp",
+      "full": "/p/full/p1020117.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020130",
+      "src": "P1020130.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#5a5a5a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "37mm",
+        "aperture": "f/6.3",
+        "shutter": "1/400s",
+        "iso": 1250,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020130.webp",
+      "full": "/p/full/p1020130.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020140",
+      "src": "P1020140.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#626262",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "42mm",
+        "aperture": "f/8",
+        "shutter": "1/320s",
+        "iso": 2000,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020140.webp",
+      "full": "/p/full/p1020140.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020164",
+      "src": "P1020164.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#3c3c3c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/320s",
+        "iso": 2500,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020164.webp",
+      "full": "/p/full/p1020164.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020169",
+      "src": "P1020169.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#919191",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/320s",
+        "iso": 2500,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020169.webp",
+      "full": "/p/full/p1020169.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020191",
+      "src": "P1020191.jpg",
+      "w": 4134,
+      "h": 2756,
+      "aspect": 1.5,
+      "color": "#3c3c3c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "34mm",
+        "aperture": "f/9",
+        "shutter": "1/200s",
+        "iso": 2500,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020191.webp",
+      "full": "/p/full/p1020191.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020197",
+      "src": "P1020197.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#542b28",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "26mm",
+        "aperture": "f/5",
+        "shutter": "1/200s",
+        "iso": 4000,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020197.webp",
+      "full": "/p/full/p1020197.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020199",
+      "src": "P1020199.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#535353",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "26mm",
+        "aperture": "f/5",
+        "shutter": "1/200s",
+        "iso": 4000,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020199.webp",
+      "full": "/p/full/p1020199.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020260",
+      "src": "P1020260.JPG",
+      "w": 5658,
+      "h": 3772,
+      "aspect": 1.5,
+      "color": "#252525",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "35mm",
+        "aperture": "f/22",
+        "shutter": "2s",
+        "iso": 160,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020260.webp",
+      "full": "/p/full/p1020260.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020261",
+      "src": "P1020261.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#3a3a3a",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "49mm",
+        "aperture": "f/22",
+        "shutter": "2s",
+        "iso": 160,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020261.webp",
+      "full": "/p/full/p1020261.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020279",
+      "src": "P1020279.JPG",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#404040",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "39mm",
+        "aperture": "f/4.7",
+        "shutter": "1s",
+        "iso": 800,
+        "date": "2025-12-30"
+      },
+      "mid": "/p/mid/p1020279.webp",
+      "full": "/p/full/p1020279.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020526",
+      "src": "P1020526.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#4a5754",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "26mm",
+        "aperture": "f/7.1",
+        "shutter": "1/400s",
+        "iso": 100,
+        "date": "2026-07-22"
+      },
+      "mid": "/p/mid/p1020526.webp",
+      "full": "/p/full/p1020526.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.408203,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.416504,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020704",
+      "src": "P1020704.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#67715b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/9",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020704.webp",
+      "full": "/p/full/p1020704.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020735",
+      "src": "P1020735.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#8394a3",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "34mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020735.webp",
+      "full": "/p/full/p1020735.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020752",
+      "src": "P1020752.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#8b947b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020752.webp",
+      "full": "/p/full/p1020752.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020771",
+      "src": "P1020771.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#9aa8aa",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020771.webp",
+      "full": "/p/full/p1020771.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020774",
+      "src": "P1020774.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#6f7979",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "30mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 200,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020774.webp",
+      "full": "/p/full/p1020774.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020780",
+      "src": "P1020780.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#766f68",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020780.webp",
+      "full": "/p/full/p1020780.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020788",
+      "src": "P1020788.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#313d48",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020788.webp",
+      "full": "/p/full/p1020788.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020792",
+      "src": "P1020792.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#152230",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "36mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020792.webp",
+      "full": "/p/full/p1020792.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.554688,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.5625,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020851",
+      "src": "P1020851.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#727d8f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "39mm",
+        "aperture": "f/8",
+        "shutter": "1/250s",
+        "iso": 1600,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020851.webp",
+      "full": "/p/full/p1020851.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.633789,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.642578,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020859",
+      "src": "P1020859.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#6e7181",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "51mm",
+        "aperture": "f/8",
+        "shutter": "1/250s",
+        "iso": 1600,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020859.webp",
+      "full": "/p/full/p1020859.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.712891,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.722656,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020888",
+      "src": "P1020888.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#2d4568",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "36mm",
+        "aperture": "f/7.1",
+        "shutter": "1/200s",
+        "iso": 2500,
+        "date": "2026-07-23"
+      },
+      "mid": "/p/mid/p1020888.webp",
+      "full": "/p/full/p1020888.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.791992,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.802734,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020929",
+      "src": "P1020929.jpeg",
+      "w": 4000,
+      "h": 6000,
+      "aspect": 0.6667,
+      "color": "#575967",
+      "orientation": "portrait",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/8",
+        "shutter": "1/160s",
+        "iso": 800,
+        "date": "2026-07-24"
+      },
+      "mid": "/p/mid/p1020929.webp",
+      "full": "/p/full/p1020929.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.920166,
+          "v": 0.000977,
+          "w": 0.052002,
+          "h": 0.078125
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.94043,
+          "v": 0.001953,
+          "w": 0.052246,
+          "h": 0.078125
+        }
+      }
+    },
+    {
+      "id": "p1020945",
+      "src": "P1020945.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#415735",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "20mm",
+        "aperture": "f/8",
+        "shutter": "1/400s",
+        "iso": 320,
+        "date": "2026-07-24"
+      },
+      "mid": "/p/mid/p1020945.webp",
+      "full": "/p/full/p1020945.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.871094,
+          "v": 0.461182,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.882813,
+          "v": 0.470703,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020975-2",
+      "src": "P1020975 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#81888b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "37mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1020975-2.webp",
+      "full": "/p/full/p1020975-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.000977,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.001953,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020975",
+      "src": "P1020975.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#81888b",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "37mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 400,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1020975.webp",
+      "full": "/p/full/p1020975.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.080078,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.082031,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020984-2",
+      "src": "P1020984 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#858582",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/11",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1020984-2.webp",
+      "full": "/p/full/p1020984-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.15918,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.162109,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1020984",
+      "src": "P1020984.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#858582",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/11",
+        "shutter": "1/400s",
+        "iso": 400,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1020984.webp",
+      "full": "/p/full/p1020984.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.238281,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.242188,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1021014-2",
+      "src": "P1021014 2.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#455a6f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 1000,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1021014-2.webp",
+      "full": "/p/full/p1021014-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.317383,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.322266,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "p1021014",
+      "src": "P1021014.jpeg",
+      "w": 6000,
+      "h": 4000,
+      "aspect": 1.5,
+      "color": "#455a6f",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Panasonic DC-S5M2",
+        "lens": "LUMIX S 20-60/F3.5-5.6",
+        "focal": "60mm",
+        "aperture": "f/8",
+        "shutter": "1/640s",
+        "iso": 1000,
+        "date": "2026-07-27"
+      },
+      "mid": "/p/mid/p1021014.webp",
+      "full": "/p/full/p1021014.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.396484,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.402344,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    },
+    {
+      "id": "7830-editada-2",
+      "src": "_7830 - editada-2.jpeg",
+      "w": 5184,
+      "h": 3456,
+      "aspect": 1.5,
+      "color": "#57483c",
+      "orientation": "landscape",
+      "exif": {
+        "camera": "Canon Canon EOS 1300D",
+        "lens": "EF-S18-55mm f/3.5-5.6 IS STM",
+        "focal": "44mm",
+        "aperture": "f/5",
+        "shutter": "1/800s",
+        "iso": 100,
+        "date": "2022-12-09"
+      },
+      "mid": "/p/mid/7830-editada-2.webp",
+      "full": "/p/full/7830-editada-2.webp",
+      "atlas": {
+        "desktop": {
+          "sheet": 0,
+          "u": 0.475586,
+          "v": 0.51416,
+          "w": 0.078125,
+          "h": 0.052002
+        },
+        "mobile": {
+          "sheet": 0,
+          "u": 0.482422,
+          "v": 0.524902,
+          "w": 0.078125,
+          "h": 0.052246
+        }
+      }
+    }
+  ]
+}

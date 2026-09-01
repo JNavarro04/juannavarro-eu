@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vercel
+
+# Source photography — 1.2GB of originals. Build inputs only, never deployed.
+photos-src/
+
+# Generated derivatives (rebuild with `npm run assets`)
+public/p/
