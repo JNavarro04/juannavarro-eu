@@ -41,3 +41,7 @@ canvas { display: block; touch-action: none; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Holds the fold while a lazily-loaded route resolves, so the page does not
+   collapse to zero height and bounce the scroll position. */
+.route-fallback { min-height: 100svh; background: var(--bg); }

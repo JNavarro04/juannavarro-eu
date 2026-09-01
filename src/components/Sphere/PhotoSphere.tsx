@@ -23,7 +23,7 @@ export const SPHERE_FOV = 35
 export const VIEWPORT_FRACTION = 0.68
 
 /** Ambient spin, radians per second. */
-export const SPIN_SPEED = 0.028
+export const SPIN_SPEED = 0 // TEMP-FREEZE
 
 /** Resting tilt of the spin axis: a lean toward the viewer and a roll, so the
  *  pole never sits dead centre and the rotation reads as a globe's. */

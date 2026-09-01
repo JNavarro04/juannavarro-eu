@@ -1,0 +1,712 @@
+/* ---------------------------------------------------------------------------
+   Contact — a sheet of paper drawn down over the page.
+
+   Not a modal. There is no card, no shadow, no radius, no gradient: the overlay
+   is the same ice white as the page, so what you perceive is a hairline edge
+   travelling down the screen and the type settling in behind it.
+
+   Everything here is scoped under .cf — this file shares a document with
+   nav.css and pages.css and must never reach outside its own overlay.
+   --------------------------------------------------------------------------- */
+
+.cf {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* --cf-h is overwritten with visualViewport.height while a soft keyboard is
+     up, so the panel never extends underneath it. */
+  height: var(--cf-h, 100dvh);
+  z-index: 300;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-sans);
+
+  /* Same gutter and top rhythm as .nav and .page, so the close button lands on
+     the nav's baseline and the type lines up with the page underneath. */
+  --cf-gutter: clamp(1.5rem, 6vw, 7rem);
+  --cf-bar-y: clamp(1.1rem, 2.5vw, 1.9rem);
+
+  /* One type size drives the fields; the label overlay borrows the same line
+     box so the resting label sits exactly where the typed text will. */
+  --cf-fs: clamp(1.05rem, 0.95rem + 0.45vw, 1.3rem);
+  --cf-line: calc(var(--cf-fs) * 1.45);
+  --cf-lift: 2rem;
+}
+
+/* --- the sheet ----------------------------------------------------------- */
+
+.cf__sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  animation: cf-wipe 0.52s var(--ease) both;
+  will-change: clip-path;
+}
+
+/* The paper's leading edge. Sits outside the sheet so it is not clipped by it,
+   and rides the same curve — you read the two as one moving object. */
+.cf__edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
+  z-index: 2;
+  pointer-events: none;
+  animation: cf-edge 0.52s var(--ease) both;
+}
+
+@keyframes cf-wipe {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes cf-edge {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100dvh); }
+}
+
+.cf.is-closing .cf__sheet { animation: cf-wipe-out 0.36s var(--ease) both; }
+.cf.is-closing .cf__edge  { animation: cf-edge-out 0.36s var(--ease) both; }
+
+@keyframes cf-wipe-out {
+  from { clip-path: inset(0 0 0 0); }
+  to   { clip-path: inset(0 0 100% 0); }
+}
+
+@keyframes cf-edge-out {
+  from { transform: translateY(100dvh); }
+  to   { transform: translateY(0); }
+}
+
+/* --- scroll surface (also the click-to-dismiss backdrop) ----------------- */
+
+.cf__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0 var(--cf-gutter);
+}
+
+.cf__dialog {
+  width: 100%;
+  max-width: 1400px;
+  min-height: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+}
+
+/* --- top bar (mirrors the nav it replaces) ------------------------------- */
+
+.cf__bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: var(--cf-bar-y) 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cf__eyebrow {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.cf__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.3s var(--ease);
+}
+
+.cf__close:hover,
+.cf__close:focus-visible { color: var(--ink); }
+
+.cf__closeGlyph {
+  width: 11px;
+  height: 11px;
+  overflow: visible;
+  transition: transform 0.45s var(--ease);
+}
+
+.cf__closeGlyph line {
+  stroke: currentColor;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.cf__close:hover .cf__closeGlyph,
+.cf__close:focus-visible .cf__closeGlyph { transform: rotate(90deg); }
+
+/* --- the two columns ----------------------------------------------------- */
+
+.cf__body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  column-gap: clamp(2.5rem, 6vw, 6.5rem);
+  align-items: start;
+  margin-block: auto;
+  padding-block: clamp(2rem, 5vh, 4rem) clamp(2.5rem, 6vh, 5rem);
+  /* Room for the iOS home indicator and a little breathing space above a
+     soft keyboard when the panel is scrolled to the bottom. */
+  padding-bottom: calc(clamp(2.5rem, 6vh, 5rem) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The address block hangs at the foot of the left column beside the form; on
+   one column it drops below everything instead of wedging between them. */
+.cf__intro { grid-area: 1 / 1; }
+.cf__form,
+.cf__done  { grid-area: 1 / 2 / 3 / 3; }
+.cf__meta  { grid-area: 2 / 1; align-self: end; }
+
+.cf__title {
+  margin: 0;
+  display: grid;
+  font-weight: 300;
+  font-size: clamp(1.85rem, 0.95rem + 2.7vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+/* Both headings occupy the same cell, so swapping one for the other cannot
+   shift a single line of the layout. */
+.cf__titleLayer {
+  grid-area: 1 / 1;
+  transition: opacity 0.5s var(--ease), transform 0.6s var(--ease);
+}
+
+.cf__titleLayer[data-on='false'] {
+  opacity: 0;
+  transform: translateY(-0.25em);
+  pointer-events: none;
+}
+
+.cf__titleLayer[data-on='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.cf__lede {
+  margin: clamp(1.25rem, 3vh, 2rem) 0 0;
+  max-width: 32ch;
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.cf__meta {
+  margin-top: clamp(2.25rem, 7vh, 4rem);
+  padding-top: clamp(1.25rem, 3vh, 1.75rem);
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem clamp(2rem, 5vw, 4rem);
+}
+
+.cf__metaCol { display: flex; flex-direction: column; gap: 0.45rem; }
+
+.cf__metaK {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.cf__metaV { font-size: var(--step-0); line-height: 1.45; }
+
+.cf__metaLink {
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s var(--ease);
+}
+
+.cf__metaLink:hover,
+.cf__metaLink:focus-visible { border-bottom-color: var(--ink); }
+
+/* --- the form ------------------------------------------------------------ */
+
+.cf__form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 3.5vh, 2.4rem);
+  transition: opacity 0.34s var(--ease), transform 0.4s var(--ease);
+}
+
+/* The moment the send succeeds the fields lift away, leaving the button to
+   finish filling on its own. */
+.cf__form[data-phase='sealing'] .cf__row:not(.cf__row--actions) {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s var(--ease), transform 0.42s var(--ease);
+  pointer-events: none;
+}
+
+.cf__row {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  column-gap: clamp(0.5rem, 1.2vw, 1rem);
+  transition: opacity 0.3s var(--ease), transform 0.42s var(--ease);
+}
+
+/* The contact-sheet frame number. Decorative — aria-hidden in the markup. */
+.cf__idx {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  line-height: var(--cf-line);
+  padding-top: var(--cf-lift);
+  color: var(--ink-soft);
+  transition: color 0.35s var(--ease);
+  user-select: none;
+}
+
+.cf__row:focus-within .cf__idx { color: var(--ink); }
+
+.cf__field {
+  position: relative;
+  padding-top: var(--cf-lift);
+}
+
+.cf__input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 0.7rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: var(--cf-fs);
+  line-height: var(--cf-line);
+  caret-color: var(--ink);
+  /* The 2px ink rule below is the focus indicator; see .cf__rule. */
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input.cf__input { height: calc(var(--cf-line) + 0.7rem); }
+
+textarea.cf__input {
+  min-height: calc(var(--cf-line) * 2 + 0.7rem);
+  max-height: 260px;
+  resize: none;
+  overflow-y: hidden;
+}
+
+/* Autofill in Chrome paints its own yellow box; hold the ice white. */
+.cf__input:-webkit-autofill,
+.cf__input:-webkit-autofill:hover,
+.cf__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 100px var(--bg) inset;
+  transition: background-color 100000s ease 0s;
+}
+
+/* A real label: bound with for/id, and it owns the resting position that the
+   value will occupy. Same line box as the input, so it overlays exactly. */
+.cf__label {
+  position: absolute;
+  top: var(--cf-lift);
+  left: 0;
+  transform-origin: 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  line-height: var(--cf-line);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: transform 0.5s var(--ease), color 0.35s var(--ease);
+}
+
+/* Float when focused, or when the field holds a value. `placeholder=" "` is
+   there only to make :placeholder-shown reliable — it is never a label. */
+.cf__input:focus + .cf__label,
+.cf__input:not(:placeholder-shown) + .cf__label {
+  transform: translateY(calc(-1 * var(--cf-lift))) scale(0.78);
+}
+
+.cf__input:focus + .cf__label { color: var(--ink); }
+
+.cf__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.cf__rule::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease);
+}
+
+.cf__field:focus-within .cf__rule::after { transform: scaleX(1); }
+
+/* Errors are never signalled by colour alone — there is always a sentence. */
+.cf__row.is-error .cf__rule { height: 1.5px; background: var(--ink); }
+
+.cf__err {
+  display: block;
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  animation: cf-err 0.32s var(--ease) both;
+}
+
+@keyframes cf-err {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Honeypot. Off-screen rather than display:none, which some bots skip. */
+.cf__trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- actions ------------------------------------------------------------- */
+
+.cf__row--actions { grid-template-columns: 2.25rem minmax(0, 1fr); }
+
+.cf__actions {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.9rem, 2vh, 1.25rem);
+  padding-top: clamp(0.5rem, 2vh, 1.25rem);
+}
+
+.cf__send {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 15rem;
+  min-height: 3.5rem;
+  padding: 0 clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cf__send[aria-disabled='true'] { cursor: default; }
+
+.cf__sendFill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease);
+}
+
+.cf__send:hover .cf__sendFill,
+.cf__send[data-state='sent'] .cf__sendFill { transform: scaleX(1); }
+
+.cf__sendLabels {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  transition: color 0.35s var(--ease);
+}
+
+.cf__send:hover .cf__sendLabels,
+.cf__send[data-state='sent'] .cf__sendLabels { color: var(--bg); }
+
+.cf__sendLabel {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(0.55em);
+  transition: opacity 0.28s var(--ease), transform 0.42s var(--ease);
+}
+
+.cf__send[data-state='idle'] .cf__sendLabel[data-when='idle'],
+.cf__send[data-state='sending'] .cf__sendLabel[data-when='sending'],
+.cf__send[data-state='sent'] .cf__sendLabel[data-when='sent'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* In-flight: a rule travelling under the label. No spinner, no image. */
+.cf__sweep {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 32%;
+  height: 2px;
+  background: var(--ink);
+  opacity: 0;
+  transform: translateX(-110%);
+}
+
+.cf__send[data-state='sending'] .cf__sweep {
+  opacity: 1;
+  animation: cf-sweep 1.15s var(--ease) infinite;
+}
+
+@keyframes cf-sweep {
+  from { transform: translateX(-110%); }
+  to   { transform: translateX(320%); }
+}
+
+/* Unconfigured-endpoint notice and send failures. */
+.cf__note,
+.cf__alert {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.cf__alert {
+  color: var(--ink);
+  padding-left: 0.9rem;
+  border-left: 1.5px solid var(--ink);
+}
+
+.cf__alertLink {
+  color: inherit;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  transition: border-color 0.3s var(--ease);
+}
+
+.cf__alertLink:hover,
+.cf__alertLink:focus-visible { border-bottom-color: var(--ink); }
+
+/* --- the settled state --------------------------------------------------- */
+
+.cf__done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1.25rem, 3vh, 2rem);
+  padding-top: var(--cf-lift);
+  outline: none;
+}
+
+.cf__mark {
+  width: clamp(46px, 5vw, 58px);
+  height: auto;
+  overflow: visible;
+  fill: none;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.cf__markRing {
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+  stroke-dasharray: 142;
+  stroke-dashoffset: 142;
+  animation: cf-draw 0.78s var(--ease) 0.06s both;
+}
+
+.cf__markTick {
+  stroke: var(--ink);
+  stroke-width: 1.75;
+  stroke-dasharray: 31;
+  stroke-dashoffset: 31;
+  animation: cf-draw 0.42s var(--ease) 0.6s both;
+}
+
+@keyframes cf-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.cf__doneText {
+  margin: 0;
+  max-width: 40ch;
+  font-size: var(--step-0);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.cf__doneText strong { font-weight: 400; color: var(--ink); }
+
+.cf__doneLink {
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  transition: border-color 0.3s var(--ease);
+}
+
+.cf__doneLink:hover,
+.cf__doneLink:focus-visible { border-bottom-color: var(--ink); }
+
+.cf__doneClose { width: auto; }
+
+/* --- entrance ladder ----------------------------------------------------- */
+
+/* `both` holds the from-state through the delay, so nothing flashes before its
+   turn — and switching the animation off leaves the natural, visible state. */
+.cf__rise { animation: cf-rise 0.78s var(--ease) both; }
+
+@keyframes cf-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.cf [data-rise='1'] { animation-delay: 0.18s; }
+.cf [data-rise='2'] { animation-delay: 0.20s; }
+.cf [data-rise='3'] { animation-delay: 0.26s; }
+.cf [data-rise='4'] { animation-delay: 0.32s; }
+.cf [data-rise='5'] { animation-delay: 0.38s; }
+.cf [data-rise='6'] { animation-delay: 0.44s; }
+.cf [data-rise='7'] { animation-delay: 0.50s; }
+.cf [data-rise='8'] { animation-delay: 0.56s; }
+.cf [data-rise='9'] { animation-delay: 0.62s; }
+
+.cf [data-settle='1'] { animation-delay: 0.04s; }
+.cf [data-settle='2'] { animation-delay: 0.60s; }
+.cf [data-settle='3'] { animation-delay: 0.74s; }
+
+/* Leaving: the ladder is irrelevant, everything goes at once. The shorthand
+   (and the specificity) resets the delays set above. */
+.cf.is-closing .cf__rise {
+  animation: cf-fade-out 0.2s var(--ease) both;
+}
+
+@keyframes cf-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* --- focus --------------------------------------------------------------- */
+
+.cf__close:focus-visible,
+.cf__send:focus-visible,
+.cf a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.cf__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- narrow -------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .cf__body {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(2rem, 5vh, 3rem);
+  }
+  .cf__intro { grid-area: auto; }
+  .cf__form,
+  .cf__done  { grid-area: auto; }
+  .cf__meta  { grid-area: auto; align-self: stretch; }
+  .cf__lede { max-width: 42ch; }
+}
+
+@media (max-width: 560px) {
+  .cf__row,
+  .cf__row--actions { grid-template-columns: minmax(0, 1fr); }
+  .cf__idx { display: none; }
+  .cf__actions { grid-column: 1; }
+  .cf__send { min-width: 0; }
+  .cf__meta { flex-direction: column; gap: 1.25rem; }
+}
+
+/* --- reduced motion ------------------------------------------------------ */
+
+/* tokens.css already collapses every duration to 0.01ms, which is right for
+   transitions but wrong for anything that starts hidden or repeats forever.
+   These rules put each of those into its finished, static state. */
+@media (prefers-reduced-motion: reduce) {
+  .cf__sheet,
+  .cf.is-closing .cf__sheet { animation: none; clip-path: none; }
+
+  .cf__edge { display: none; }
+
+  .cf__rise,
+  .cf.is-closing .cf__rise { animation: none; opacity: 1; transform: none; }
+
+  .cf__err { animation: none; }
+
+  .cf__markRing,
+  .cf__markTick { animation: none; stroke-dashoffset: 0; }
+
+  .cf__send[data-state='sending'] .cf__sweep {
+    animation: none;
+    width: 100%;
+    transform: none;
+    opacity: 1;
+  }
+
+  .cf__closeGlyph,
+  .cf__close:hover .cf__closeGlyph,
+  .cf__close:focus-visible .cf__closeGlyph { transform: none; }
+}

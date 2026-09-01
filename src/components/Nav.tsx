@@ -4,7 +4,7 @@ import '../styles/nav.css'
 
 const INSTAGRAM = SITE.socials[0]
 
-/** "Juan Navarro" → "JN". Replaces the wordmark below ~360px so nothing wraps. */
+/** "Juan Navarro" → "JN". Replaces the wordmark below 340px so nothing wraps. */
 const INITIALS = SITE.name
   .split(' ')
   .map((word) => word.charAt(0))

@@ -58,9 +58,9 @@ export type TileLayoutOptions = {
 
 /** The tunables. Change these to retune the surface. */
 export const TILE_LAYOUT_DEFAULTS: TileLayoutOptions = {
-  fill: 1.22,
-  sizeJitter: 0.1,
-  maxTilt: (14 * Math.PI) / 180,
+  fill: 1.0,
+  sizeJitter: 0.05,
+  maxTilt: (0 * Math.PI) / 180,
   alignNeighbours: 6,
   seed: 1337,
 }

@@ -134,7 +134,9 @@
   .nav__links { gap: 0.85rem; }
 }
 
-@media (max-width: 359px) {
+/* The full wordmark still fits at 320px, but only just, and a wider monospace
+   fallback would crowd WORK. Below this the initials read as deliberate. */
+@media (max-width: 340px) {
   .nav__mark-full { display: none; }
   .nav__mark-short { display: inline; }
 }
