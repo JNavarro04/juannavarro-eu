@@ -32,6 +32,13 @@
       This portfolio renders its gallery with WebGL and needs JavaScript enabled.
       Reach Juan at <a href="mailto:navarro.frames@gmail.com">navarro.frames@gmail.com</a>.
     </noscript>
+    <script>
+      // The landing composition plays once per load, and yields the moment the
+      // sphere is under scroll control. A browser restoring scrollY on reload
+      // therefore cancels it within a frame or two. Set before any module runs,
+      // so the restore never happens rather than being undone afterwards.
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

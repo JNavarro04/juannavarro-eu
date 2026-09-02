@@ -215,6 +215,75 @@ const MORPH_PLACEMENT_GLSL = /* glsl */ `
   }
 `
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  THE LANDING COMPOSITION — the globe drawing itself together, once
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * The morph above is scrubbed by scroll and is reversible. This is neither: it
+ * runs on a clock from the first frame of a page load, finishes, and then is
+ * not there. Its whole schedule lives in introClock.ts, which is also where the
+ * mirrors of the three functions below are; 'uIntro' is how much of it is still
+ * to come, 1 at the first frame and 0 for the rest of the page's life.
+ *
+ * THE ONE THING THAT MATTERS about this block: at 'uIntro' 0 every function here
+ * returns exactly zero — not nearly zero — so the globe the visitor is left with
+ * is the signed-off globe, joint for joint, and the morph maths this sits in
+ * front of computes bit for bit what it computed before any of this existed.
+ * The vertex programs below also guard the whole thing behind a uniform branch,
+ * so at rest none of it is even executed.
+ *
+ * The excursion is radial, for the same reason 'morphRadial' is: it moves a tile
+ * along its own normal and never across the shell, so it cannot change which
+ * tile is beside which and cannot open or close a joint. A tile is therefore
+ * incapable of arriving anywhere except its layout position.
+ *
+ * Included AFTER the morph block in both programs, because it reuses that
+ * block's 'morphEase' rather than declaring a second smootherstep.
+ */
+const INTRO_PLACEMENT_GLSL = /* glsl */ `
+  /**
+   * The composition's own clock, for one tile.
+   *
+   * Deliberately the same shape as 'morphLocal': a delay proportional to how
+   * near the poles the tile is, so a wave runs from the globe's waist outward
+   * and the courses fill in one after another rather than all at once. The
+   * per-tile term on top of it staggers the 162 within each course.
+   *
+   * @param back    how much of the composition is still to come, 1 → 0
+   * @param ripple  head start given to the equator, in progress units
+   * @param jitter  per-tile random delay, same units
+   * @param centerY the tile centre's Y in the sphere's own frame
+   * @param seed    the tile's own random, [0,1)
+   *
+   * The latest tile is delayed by ripple + jitter, so the span is shortened by
+   * exactly that and every tile has landed by the time 'back' reaches 0.
+   */
+  float introLocal(float back, float ripple, float jitter, float centerY, float seed) {
+    float t = 1.0 - back;
+    float delay = ripple * abs(centerY) + jitter * seed;
+    return clamp((t - delay) / max(1e-4, 1.0 - ripple - jitter), 0.0, 1.0);
+  }
+
+  /**
+   * How far outside the shell this tile still is, world units.
+   *
+   * Monotonic, with no bloom and no overshoot — unlike the morph's excursion,
+   * which has both. A tile leaves its dispersed radius once and decelerates onto
+   * the shell. The per-tile scatter is the morph's own (0.7 + 0.6 * seed), so
+   * neighbouring tiles do not travel as a rigid sheet.
+   */
+  float introLift(float ease, float seed, float amount) {
+    return amount * (1.0 - ease) * (0.7 + 0.6 * seed);
+  }
+
+  /** A tile's opacity as it draws in: 'start' at its furthest, exactly 1 when
+   *  it lands. */
+  float introAlpha(float ease, float start) {
+    return mix(start, 1.0, ease);
+  }
+`
+
 export const sphereVertexShader = /* glsl */ `
   attribute vec3 iCenter;   // unit direction of this tile's centre
   attribute vec2 iSize;     // angular half-extents (radians), tile u then v
@@ -232,15 +301,24 @@ export const sphereVertexShader = /* glsl */ `
   uniform float uBloom;     // outward excursion mid-morph, world units
   uniform float uSettle;    // overshoot-and-settle at the end, world units
 
+  uniform float uIntro;       // landing composition still to come: 1 → 0, once
+  uniform float uIntroLift;   // how far outside the shell a tile starts, world
+  uniform float uIntroAlpha;  // a tile's opacity at its furthest
+  uniform float uIntroRipple; // head start given to the equator, progress units
+  uniform float uIntroJitter; // per-tile random delay, progress units
+
   varying vec2 vUv;
   varying vec4 vRect;
+  varying float vAlpha;
 
   ${TILE_PLACEMENT_GLSL}
   ${MORPH_PLACEMENT_GLSL}
+  ${INTRO_PLACEMENT_GLSL}
 
   void main() {
     vUv = uv;
     vRect = iUV;
+    vAlpha = 1.0;
 
     // Handed over to a near tile drawing the same photograph at its own
     // resolution, in the same place. Collapse this quad outside the clip volume
@@ -256,16 +334,34 @@ export const sphereVertexShader = /* glsl */ `
 
     // The resting globe, untouched — not merely mix()ed with a weight of zero.
     // This is the state the client signed off; it does not depend on a single
-    // line of the maths below being right.
-    if (uFlatten <= 0.0) {
+    // line of the maths below being right. It is also where the page spends all
+    // but the first second and a half of its life: once the landing composition
+    // is spent, 'uIntro' is 0 for ever and this is the only branch that runs.
+    if (uFlatten <= 0.0 && uIntro <= 0.0) {
       gl_Position =
         projectionMatrix * modelViewMatrix *
         vec4(dir * tileRadius(uRadius, uRelief, iSeed), 1.0);
       return;
     }
 
+    // The landing composition. Guarded rather than mixed to zero so that a
+    // finished page cannot be a rounding error away from the signed-off one:
+    // when 'uIntro' is 0 the lift is the literal 0.0 below and vAlpha the
+    // literal 1.0 above, and the morph arithmetic that follows is untouched.
+    float lift = 0.0;
+    if (uIntro > 0.0) {
+      float ease =
+        morphEase(introLocal(uIntro, uIntroRipple, uIntroJitter, iCenter.y, iSeed));
+      lift = introLift(ease, iSeed, uIntroLift);
+      vAlpha = introAlpha(ease, uIntroAlpha);
+    }
+
     float local = morphLocal(uFlatten, uRipple, iCenter.y);
-    float radial = morphRadial(local, iSeed, uBloom, uSettle);
+    // The composition rides in the morph's own radial term, so a tile that is
+    // still drawing in while the visitor has already begun to scroll is carried
+    // correctly through both at once. It cannot happen for more than a quarter
+    // of a second — see introClock.ts — but it must not tear if it does.
+    float radial = morphRadial(local, iSeed, uBloom, uSettle) + lift;
 
     vec4 shell =
       modelViewMatrix * vec4(dir * (tileRadius(uRadius, uRelief, iSeed) + radial), 1.0);
@@ -286,6 +382,7 @@ export const sphereFragmentShader = /* glsl */ `
 
   varying vec2 vUv;
   varying vec4 vRect;
+  varying float vAlpha;
 
   void main() {
     // Atlas rects are packed with the image origin at top-left; GL's t axis
@@ -304,6 +401,25 @@ export const sphereFragmentShader = /* glsl */ `
     // chunks put it back into the renderer's output space unchanged.
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
+
+    // The landing composition's per-tile fade, and nothing else.
+    //
+    // Applied after the encode above, and to colour as well as alpha, so the
+    // fragment leaves here PREMULTIPLIED. That is the whole reason the material
+    // does not have to switch blending on for the composition: the canvas is
+    // composited premultiplied, so a pixel written straight through with GL
+    // blending off still shows the page correctly behind a half-faded tile.
+    // The material's shader program, render list and depth behaviour are
+    // therefore exactly what they were.
+    //
+    // Doing it the other way round — scaling only alpha, the convention
+    // 'uOpacity' above uses — would add (1 - alpha) of white to every tile and
+    // clip a bright photograph to flat paper while it faded in.
+    //
+    // At vAlpha 1, which is every frame after the first second and a half, both
+    // multiplies are exact no-ops and this is the shader that shipped.
+    gl_FragColor.rgb *= vAlpha;
+    gl_FragColor.a *= vAlpha;
   }
 `
 
@@ -330,17 +446,25 @@ export const nearTileVertexShader = /* glsl */ `
   uniform float uRipple;
   uniform float uBloom;
   uniform float uSettle;
+  uniform float uIntro;
+  uniform float uIntroLift;
+  uniform float uIntroAlpha;
+  uniform float uIntroRipple;
+  uniform float uIntroJitter;
 
   varying vec2 vUv;
+  varying float vAlpha;
 
   ${TILE_PLACEMENT_GLSL}
   ${MORPH_PLACEMENT_GLSL}
+  ${INTRO_PLACEMENT_GLSL}
 
   void main() {
     vUv = uv;
+    vAlpha = 1.0;
     vec3 dir = tilePlacement(uCenter, uSize, uRot, position.xy);
 
-    if (uFlatten <= 0.0) {
+    if (uFlatten <= 0.0 && uIntro <= 0.0) {
       gl_Position =
         projectionMatrix * modelViewMatrix *
         vec4(dir * tileRadius(uRadius, uRelief, uSeed), 1.0);
@@ -350,9 +474,21 @@ export const nearTileVertexShader = /* glsl */ `
     // Bit for bit the instanced program's arithmetic, on the same inputs. A
     // photograph that is being drawn from its own file has to sit exactly where
     // its instanced twin would have: any disagreement here would show as the
-    // sharp tiles fanning while everything around them straightened.
+    // sharp tiles fanning while everything around them straightened. The landing
+    // composition is included in that even though a near tile cannot be in play
+    // during it — the camera is at its resting distance, and near tiles do not
+    // exist above NEAR_ACTIVATE_SCALE. It is here so the two programs cannot
+    // drift apart if that ever stops being true.
+    float lift = 0.0;
+    if (uIntro > 0.0) {
+      float ease =
+        morphEase(introLocal(uIntro, uIntroRipple, uIntroJitter, uCenter.y, uSeed));
+      lift = introLift(ease, uSeed, uIntroLift);
+      vAlpha = introAlpha(ease, uIntroAlpha);
+    }
+
     float local = morphLocal(uFlatten, uRipple, uCenter.y);
-    float radial = morphRadial(local, uSeed, uBloom, uSettle);
+    float radial = morphRadial(local, uSeed, uBloom, uSettle) + lift;
 
     vec4 shell =
       modelViewMatrix * vec4(dir * (tileRadius(uRadius, uRelief, uSeed) + radial), 1.0);
@@ -381,6 +517,7 @@ export const nearTileFragmentShader = /* glsl */ `
   uniform float uOpacity;
 
   varying vec2 vUv;
+  varying float vAlpha;
 
   void main() {
     vec4 texel = texture2D(uTile, vec2(vUv.x, 1.0 - vUv.y));
@@ -388,5 +525,11 @@ export const nearTileFragmentShader = /* glsl */ `
 
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
+
+    // The atlas program's line, for the same reason. vAlpha is 1 whenever a
+    // near tile is on screen at all, so in practice this is two multiplies by
+    // one — kept so the two programs stay the same program.
+    gl_FragColor.rgb *= vAlpha;
+    gl_FragColor.a *= vAlpha;
   }
 `

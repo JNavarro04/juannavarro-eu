@@ -32,6 +32,13 @@ function usePrefersReducedMotion(): boolean {
  *
  * The canvas is not mounted until the atlas is decoded — a canvas that appears
  * empty and then fills in is worse than one that appears late.
+ *
+ * That gate is also what starts the landing composition at the right moment.
+ * The composition's clock is advanced from the sphere's frame callback and from
+ * nowhere else (see introClock.ts), so it cannot begin before there is a sphere
+ * to draw — which means it cannot play out against blank tiles while the 1.8MB
+ * sheet is still in flight. Nothing here needs to know about it; the ordering is
+ * a consequence of the gate rather than a second thing to keep in step with it.
  */
 export default function SphereStage({ drive, className }: SphereStageProps) {
   // Picked once. A phone does not become a desktop mid-session, and swapping

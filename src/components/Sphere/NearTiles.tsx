@@ -49,6 +49,15 @@ import {
   releaseTileTexture,
   setTileTextureAnisotropy,
 } from '../../lib/tileTextures'
+import {
+  INTRO_ALPHA,
+  INTRO_JITTER,
+  INTRO_LIFT,
+  INTRO_RIPPLE,
+  advanceIntro,
+  introRemaining,
+  introYields,
+} from './introClock'
 import { nearTileFragmentShader, nearTileVertexShader } from './shaders'
 import { sphereDrive, type SphereDrive } from './sphereDrive'
 
@@ -298,7 +307,7 @@ export default function NearTiles({
     }
   }, [hidden])
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const group = groupRef.current
     if (!group) return
 
@@ -310,6 +319,20 @@ export default function NearTiles({
     const { centers, sizes, rotations, seeds, count } = layout
     const flatten = flattenFor(d, morph)
     const ringSlots = morph.ring.slots
+
+    // The landing composition, for the same reason `flatten` is computed here
+    // rather than handed down: r3f runs this callback before the parent's, so a
+    // value passed from PhotoSphere would arrive a frame late and a near tile a
+    // frame behind its instanced twin is a visible shear. Both call this with
+    // the frame's own clock stamp and whichever gets there first does the work.
+    // In practice a near tile cannot exist during the composition — the camera
+    // is at its resting distance and these come in below NEAR_ACTIVATE_SCALE —
+    // so this is here to keep the two programs from ever drifting apart.
+    const intro = advanceIntro(
+      state.clock.elapsedTime,
+      delta,
+      introYields(distanceScale, d.spin ?? 0, d.tilt ?? 0, flatten),
+    )
 
     // Hysteresis: come in below the activate scale, go out above the release one.
     activeRef.current = activeRef.current
@@ -403,6 +426,7 @@ export default function NearTiles({
       u.uRipple.value = morph.ripple
       u.uBloom.value = morph.bloom
       u.uSettle.value = morph.settle
+      u.uIntro.value = intro
     }
 
     const free = (slot: Slot): void => {
@@ -436,6 +460,12 @@ export default function NearTiles({
           uRipple: { value: morph.ripple },
           uBloom: { value: morph.bloom },
           uSettle: { value: morph.settle },
+          // The instanced program's, to the number. See introClock.ts.
+          uIntro: { value: introRemaining() },
+          uIntroLift: { value: INTRO_LIFT },
+          uIntroAlpha: { value: INTRO_ALPHA },
+          uIntroRipple: { value: INTRO_RIPPLE },
+          uIntroJitter: { value: INTRO_JITTER },
         },
         side: THREE.FrontSide,
         // Always blended: the crossfade needs it, and at full opacity the blend

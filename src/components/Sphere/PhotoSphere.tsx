@@ -18,6 +18,17 @@ import {
   type TileLayout,
 } from '../../lib/sphereMath'
 import { sphereDrive, type SphereDrive } from './sphereDrive'
+import {
+  INTRO_ALPHA,
+  INTRO_JITTER,
+  INTRO_LIFT,
+  INTRO_RIPPLE,
+  advanceIntro,
+  introRemaining,
+  introSpinScale,
+  introYields,
+  skipIntro,
+} from './introClock'
 import { sphereFragmentShader, sphereVertexShader } from './shaders'
 import NearTiles, {
   NEAR_TILES_DESKTOP,
@@ -319,6 +330,13 @@ export default function PhotoSphere({
           uRipple: { value: MORPH_RIPPLE },
           uBloom: { value: MORPH_BLOOM },
           uSettle: { value: MORPH_SETTLE },
+          // The landing composition. uIntro is written every frame; the four
+          // below never change — see introClock.ts, which owns the gesture.
+          uIntro: { value: introRemaining() },
+          uIntroLift: { value: INTRO_LIFT },
+          uIntroAlpha: { value: INTRO_ALPHA },
+          uIntroRipple: { value: INTRO_RIPPLE },
+          uIntroJitter: { value: INTRO_JITTER },
         },
         // Tiles face outward, so the far half of the shell culls itself and the
         // gaps show the page instead of the backs of distant photographs.
@@ -335,6 +353,13 @@ export default function PhotoSphere({
     texture.anisotropy = Math.min(16, gl.capabilities.getMaxAnisotropy())
     texture.needsUpdate = true
   }, [texture, gl])
+
+  useLayoutEffect(() => {
+    // Unprompted motion, so prefers-reduced-motion removes it rather than
+    // shortening it: the assembled globe is simply there. A layout effect
+    // because it has to land before r3f's first frame, not after it.
+    if (reducedMotion) skipIntro()
+  }, [reducedMotion])
 
   useLayoutEffect(() => {
     // THREE.InstancedMesh allocates its instance matrices as zeros. The shader
@@ -404,13 +429,29 @@ export default function PhotoSphere({
     }
   }, [placement, camera, gl, morph])
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const d = drive ?? sphereDrive
+    const flatten = flattenFor(d, morph)
+
+    // The landing composition — see introClock.ts. It is on its own clock, it
+    // plays once per page load, and it never writes to the drive: the only
+    // thing it reads from the drive is whether the visitor has taken over, in
+    // which case it runs out its remainder in a quarter of a second and gets
+    // out of the way. NearTiles calls this too, with the same frame stamp, and
+    // the second caller in a frame gets the first one's answer.
+    const intro = advanceIntro(
+      state.clock.elapsedTime,
+      delta,
+      introYields(d.distanceScale ?? 1, d.spin ?? 0, d.tilt ?? 0, flatten),
+    )
 
     // Frame-rate independent, and clamped so a backgrounded tab does not come
     // back to a sphere that has spun half a turn during a single long frame.
+    // The composition's contribution is a multiplier on the ambient rate and
+    // decays to exactly 1, so what it leaves behind is the shipped drift.
     if (!reducedMotion) {
-      ambientSpin.current += Math.min(delta, 0.1) * SPIN_SPEED * (d.spinScale ?? 1)
+      ambientSpin.current +=
+        Math.min(delta, 0.1) * SPIN_SPEED * (d.spinScale ?? 1) * introSpinScale(intro)
     }
     if (spinRef.current) spinRef.current.rotation.y = ambientSpin.current + (d.spin ?? 0)
     if (axisRef.current) axisRef.current.rotation.x = AXIS_TILT_X + (d.tilt ?? 0)
@@ -421,15 +462,20 @@ export default function PhotoSphere({
       baseDistance * (d.distanceScale ?? 1),
     )
 
-    const flatten = flattenFor(d, morph)
     flattenRef.current = flatten
     material.uniforms.uFlatten.value = flatten
     material.uniforms.uRipple.value = morph.ripple
     material.uniforms.uBloom.value = morph.bloom
     material.uniforms.uSettle.value = morph.settle
+    material.uniforms.uIntro.value = intro
 
     const opacity = d.opacity ?? 1
     material.uniforms.uOpacity.value = opacity
+    // Untouched by the composition, deliberately. Its per-tile fade leaves the
+    // fragment premultiplied, and this canvas is composited premultiplied, so
+    // the page shows through a half-faded tile correctly with GL blending off —
+    // which is what leaves this material's shader program, render list and
+    // depth behaviour exactly as they were. See the fragment shader.
     material.transparent = opacity < 1
   })
 
@@ -589,15 +635,25 @@ const PICK_RING_FROM = 0.5
  * i.e. straight from a PointerEvent's `clientX`/`clientY`.
  *
  * Returns null when the sphere is not mounted, when the pointer is outside the
- * canvas, when the ray misses the surface entirely, and when it lands on a joint
- * between two photographs. Works at any zoom, in either shape and anywhere
- * between them, and while the surface is turning: the orientation and the morph
- * amount are both read at the moment of the call.
+ * canvas, when the ray misses the surface entirely, when it lands on a joint
+ * between two photographs, and while the landing composition is still playing.
+ * Works at any zoom, in either shape and anywhere between them, and while the
+ * surface is turning: the orientation and the morph amount are both read at the
+ * moment of the call.
  *
  * Cheap enough to call on `pointermove` — one ray and 162 tiles, with no
  * rasterisation and nothing allocated.
  */
 export function pickPhotoAt(clientX: number, clientY: number): PhotoPick | null {
+  // The landing composition displaces every tile along its own normal, and
+  // neither test below models that — they would both answer from the layout
+  // while the shader is drawing something else, and near the limb that is a
+  // different photograph. It lasts a second and a half at the very start of a
+  // page load, it ends the moment the visitor touches anything, and no
+  // considered press on a photograph happens inside it. Declining to answer is
+  // the honest option; guessing is not.
+  if (introRemaining() > 0) return null
+
   const live = liveSphere
   if (!live) return null
   const spin = live.spin.current
