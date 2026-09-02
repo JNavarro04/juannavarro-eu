@@ -15,14 +15,19 @@ export const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 /**
  * Which arrangement the sphere is laid out with.
  *
- * `fibonacci` — one golden-angle spiral, tiles sized to their share of the
- * sphere. Isotropic, seamless, organic; joints are whatever is left over.
+ * `bands` — horizontal courses of constant latitude. Each course is solved to
+ * fill its own circumference exactly, so the white between two photographs is a
+ * width that was chosen rather than a leftover, and no photograph is ever cut
+ * by its neighbour. Brickwork on a globe.
  *
- * `bands` — horizontal courses of constant latitude, each solved to fill its
- * own circumference exactly, so the joint is designed rather than residual.
+ * `fibonacci` — one golden-angle spiral, every tile sized to its own share of
+ * the sphere. Isotropic and seamless, but the sphere it makes is a *pile*: a
+ * seventh of the surface has two photographs on it, and the joints run from
+ * nothing to a fifth of a tile depending on where the spiral landed. Kept
+ * because it is the honest alternative and the comparison is the argument.
  *
- * See the comparison in {@link BAND_LAYOUT_DEFAULTS} for why the default is
- * what it is. Changing this line changes the whole surface.
+ * See {@link BAND_LAYOUT_DEFAULTS} for the measurements. Changing this line
+ * changes the whole surface and nothing else has to move.
  */
 export type LayoutMode = 'fibonacci' | 'bands'
 
@@ -33,7 +38,8 @@ export type TileLayoutOptions = {
   /** Which arrangement to build. Defaults to {@link LAYOUT}. */
   layout: LayoutMode
   /**
-   * How much of its own share of the sphere each tile tries to cover.
+   * `fibonacci` only. How much of its own share of the sphere each tile tries
+   * to cover.
    *
    * Each tile owns 4π/N steradians. A tile's patch is ~4·w·h steradians, so
    * `fill = 1` would tile the sphere exactly *if* the cells were axis-aligned
@@ -51,7 +57,7 @@ export type TileLayoutOptions = {
    *
    *   fill 0.95 → 84% covered, 10% double-covered — airy, but a few cells go
    *                            conspicuously empty and read as a missing photo
-   *   fill 1.05 → 89% covered, 15% double-covered  ← default
+   *   fill 1.05 → 89% covered, 15% double-covered  ← this path's default
    *   fill 1.12 → 91% covered, 19% double-covered
    *   fill 1.22 → 94% covered, 25% double-covered — gaps nearly closed, and
    *                            the surface goes back to reading as a pile
@@ -63,7 +69,7 @@ export type TileLayoutOptions = {
    */
   fill: number
   /**
-   * ±fraction of size variation per tile, from a seeded RNG.
+   * `fibonacci` only. ±fraction of size variation per tile, from a seeded RNG.
    *
    * The photographs are already many different shapes; this is only there so
    * that two neighbours of the same aspect are not identical twins. Kept
@@ -72,7 +78,7 @@ export type TileLayoutOptions = {
    */
   sizeJitter: number
   /**
-   * Maximum tile tilt away from the local horizon, radians. Off by default.
+   * `fibonacci` only. Maximum tile tilt away from the local horizon, radians.
    *
    * Tiles can be nudged toward the direction in which their neighbours are
    * furthest away, which lets a 3:2 photo lie along the roomy axis of its
@@ -113,8 +119,8 @@ export type BandLayoutOptions = {
    * This is the whole point of the arrangement. A course is solved to fill its
    * own circumference, so what is left between two photographs is a width that
    * was chosen rather than whatever a lattice happened to leave over. At the
-   * shipped radius one radian of arc is about 306 px, so 0.026 is an eight-pixel
-   * joint at the middle of the disc.
+   * shipped radius one radian of arc is about 306 px, so 0.028 is a joint just
+   * under nine pixels at the middle of the disc.
    */
   joint: number
   /** Longitude offset of alternate courses, in mean tile widths. 0.5 is a
@@ -123,8 +129,14 @@ export type BandLayoutOptions = {
   /** Deterministic wobble on that offset, same units. Keeps the bond from
    *  reading as a repeat when six courses are visible at once. */
   bondJitter: number
-  /** Fewest tiles in a course, so the courses nearest the poles still read as
-   *  courses rather than as two or three lonely frames around the axis. */
+  /**
+   * Fewest tiles in a course.
+   *
+   * Only ever binds at the two ends. It is really a control on the polar cap:
+   * forcing more frames into the last course makes each of them shorter, the
+   * stack falls further short of the pole, and the white disc left there grows.
+   * At 3 the cap is 0.061 rad; at 5 it is 0.114.
+   */
   minPerBand: number
   /**
    * Which parallel a course is solved to fill: 0 its centre line, 1 the edge
@@ -136,20 +148,27 @@ export type BandLayoutOptions = {
    * middle exactly have a little less room than they need at that edge, and two
    * neighbours can graze each other at the corner nearest the pole.
    *
-   * Measured at joint 0.024, over the whole sphere and over the part of it the
-   * camera can actually reach:
+   * Measured at joint 0.028, and with the deepest crossing in each course
+   * measured directly, in pixels at the shipped framing:
    *
-   *   0.0  82.5% covered, 0.24% double  (on screen 83.0% / 0.21%)  ← default
-   *   0.5  79%   covered, 0.00% double, but the joint stops being one number:
-   *        the slack that buys the guarantee is spread along each course, and
-   *        the polar courses end up with 25px joints against the equator's 7px
-   *   1.0  76%   covered, 0.00% double, and worse on the same count
+   *   0.00  80.1% covered, 0.19% double, polar cap 0.060 rad   ← default
+   *         crossings 8.9 / 7.0 / 2.7 / 0 / 0 / 0 / 0 / 0 / 0 / 0.3 / 2.6 /
+   *         8.2 / 10.9 px, course by course from pole to pole
+   *   0.25  78.1% covered, 0.02% double, polar cap 0.083 rad
+   *   0.50  75.9% covered, 0.00% double, polar cap 0.103 rad
+   *   1.00  71.9% covered, 0.00% double, polar cap 0.144 rad
    *
-   * So 0 it is. The quarter of a percent that overlaps is corner grazing in the
-   * three courses closest to each pole, and those sit within a few degrees of
-   * the silhouette where a tile is a couple of pixels tall. Buying it out costs
-   * the one thing the arrangement exists for — a joint that is the same width
-   * everywhere.
+   * 0 is the default because the five courses across the middle of the disc —
+   * the ones actually being looked at — are already exactly zero, and the rest
+   * is corner grazing in the courses at the rim, where a tile is a few pixels
+   * tall and the crossing is compressed with it.
+   *
+   * Buying the last of it out costs both of the things the arrangement exists
+   * for. The joint stops being one number: the slack that pays for the
+   * guarantee is spread along each course, so at 0.5 the courses near the poles
+   * carry 25px joints against the equator's 8px. And the polar cap grows past
+   * the point where the framing hides it — at 0.144 rad it clears the
+   * silhouette and shows as a white bite out of the rim.
    */
   edgeFit: number
   /**
@@ -174,20 +193,21 @@ export type BandLayoutOptions = {
  * Measured on the real 162-photo manifest, 250k sample directions, against the
  * `fibonacci` lattice this replaced (fill 1.05):
  *
- *   fibonacci  88.6% covered, 14.58% double-covered, joints 0 to 20 px
- *   bands      82.5% covered,  0.24% double-covered, every joint 7.3 px
+ *   fibonacci  88.6% covered, 14.58% double-covered, joints from 0 to ~20px
+ *   bands      80.1% covered,  0.19% double-covered, every joint 8.6px
  *
- * The bands cover less and that is the whole point. The six points the lattice
- * had over them were bought by letting photographs lie across one another —
- * fifteen percent of the sphere was one frame cutting through another. Here
- * that number is a quarter of a percent, all of it corner grazing in the
- * courses nearest the poles, which the framing keeps behind the silhouette.
+ * The bands cover less and that is the whole point. The eight points the
+ * lattice had over them were bought by letting photographs lie across one
+ * another: a seventh of the sphere was one frame cutting through another, and
+ * the white that was left over arrived wherever the spiral happened to leave
+ * it. Here the white is a number that was chosen, and it is the same number
+ * everywhere.
  */
 export const BAND_LAYOUT_DEFAULTS: BandLayoutOptions = {
-  joint: 0.024,
+  joint: 0.028,
   bond: 0.5,
   bondJitter: 0.18,
-  minPerBand: 4,
+  minPerBand: 3,
   edgeFit: 0,
   heightMode: 'uniform',
   seed: 1337,
@@ -674,8 +694,8 @@ function layoutBandTiles(
     const perArc = (2 * Math.PI) / Math.max(1e-6, arc)
 
     // Running bond, so no vertical joint sits above another. The wobble is
-    // there because five courses of perfect half-offset start to read as a
-    // pattern rather than as masonry.
+    // there because the six courses visible at once, all offset by exactly
+    // half, start to read as a repeating pattern rather than as masonry.
     const meanTile = (2 * Math.PI) / count
     const wobble = options.bondJitter * (rng() * 2 - 1)
     const lambda0 = (options.bond * (k % 2) + wobble) * meanTile

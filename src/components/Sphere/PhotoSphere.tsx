@@ -15,8 +15,12 @@ import { sphereFragmentShader, sphereVertexShader } from './shaders'
 import type { AtlasKind } from './useAtlasTexture'
 
 /* ── Tunables ───────────────────────────────────────────────────────────────
-   Layout tunables (fill, size jitter, tilt) live in src/lib/sphereMath.ts, in
-   TILE_LAYOUT_DEFAULTS, with the coverage measurements that produced them. */
+   How the photographs are arranged on the shell — courses, joint width, tile
+   count per course — lives in src/lib/sphereMath.ts, in LAYOUT and
+   BAND_LAYOUT_DEFAULTS, with the measurements that produced them. What is here
+   is how that shell is aimed at the camera. The one that matters most is
+   BAND_AXIS_TILT_DEG: the courses are the sphere's parallels, so where the
+   polar axis points is what sets their angle on screen. */
 
 /** Sphere radius in world units. Everything else is expressed against it. */
 export const SPHERE_RADIUS = 1
@@ -60,8 +64,15 @@ export const AXIS_TILT_Z = Math.atan(
   Math.tan((BAND_AXIS_TILT_DEG * Math.PI) / 180) * Math.cos(AXIS_TILT_X),
 )
 
-/** Per-tile radius wobble, as a fraction of the radius. Gives overlaps a
- *  definite stacking order and the surface a little life. */
+/**
+ * Per-tile radius wobble, as a fraction of the radius.
+ *
+ * Under the band layout almost nothing overlaps, so this is no longer load
+ * bearing the way it was — but the courses at the very rim still graze each
+ * other at the corner nearest the pole, and three thousandths of the radius is
+ * enough to give those a definite stacking order instead of a z-fight. Far too
+ * little to dent the silhouette.
+ */
 export const RELIEF = 0.003
 
 /** Subdivision of each tile. 12×12 keeps the curvature smooth at this angular
