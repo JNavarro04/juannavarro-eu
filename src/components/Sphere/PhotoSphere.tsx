@@ -5,10 +5,16 @@ import * as THREE from 'three'
 import type { Photo } from '../../types'
 import {
   distanceForViewportFraction,
+  halfDiagonalFov,
   hexLuminance,
   layoutTiles,
+  morphEase,
+  morphLocal,
+  morphRadial,
+  planRing,
   shuffledIndices,
   tonalOrder,
+  type RingLayout,
   type TileLayout,
 } from '../../lib/sphereMath'
 import { sphereDrive, type SphereDrive } from './sphereDrive'
@@ -16,6 +22,8 @@ import { sphereFragmentShader, sphereVertexShader } from './shaders'
 import NearTiles, {
   NEAR_TILES_DESKTOP,
   NEAR_TILES_MOBILE,
+  flattenFor,
+  type MorphSettings,
   type TilePose,
 } from './NearTiles'
 import type { AtlasKind } from './useAtlasTexture'
@@ -87,6 +95,73 @@ export const RELIEF = 0.003
  *  size; the whole sphere is still only ~47k triangles in one draw call. */
 export const TILE_SEGMENTS = 12
 
+/* ── The ring ───────────────────────────────────────────────────────────────
+   What the globe opens out into as the camera comes in: a cylinder of
+   photographs about a vertical axis, four rows tall, that turns for ever. The
+   layout of it — how the thirteen courses become four rows, and how each row is
+   solved to close on itself — is in src/lib/sphereMath.ts under
+   RING_LAYOUT_DEFAULTS. What is here is how the change is *performed*.        */
+
+/**
+ * Ring radius, as a multiple of the sphere's.
+ *
+ * The single number that decides how large a photograph is on the ring, because
+ * a row has to fit its ~40 frames into 2π·radius. At 1 the ring's axis passes
+ * exactly through the globe's centre and its near face through the globe's near
+ * point, so the photograph at the middle of the frame does not move at all
+ * during the morph — the surface opens out around whatever the visitor is
+ * already looking at.
+ *
+ * At 1 the ring is 4 rows of ~40, each frame 0.099 world tall with a 0.0133
+ * joint. Measured at the camera's current stop (SPHERE_FOV 35, STOP_COVER 1):
+ *
+ *   1920×1080   8.0 photographs across the frame, 285 CSS px each
+ *   1440×900    7.9 across, 211 px
+ *   1024×1024   6.8 across, 157 px
+ *   390×844     4.0 across,  92 px   ← a phone, and too small: the fix is the
+ *                                      camera's stop, not this. See the report.
+ *
+ * Raising it makes the frames larger and fewer, since the circumference has to
+ * carry the same 40 either way.
+ */
+export const RING_RADIUS_SCALE = 1
+
+/**
+ * The head start the equator gets over the poles, in `flatten` units.
+ *
+ * Without it all 162 photographs leave the shell on the same schedule, and a
+ * uniform transition of 162 objects reads as a diagram rather than as a
+ * movement. With it a wave runs from the globe's waist out to both poles: the
+ * equator gathers into the rows first and the caps fold in after it.
+ *
+ * The direction was measured, not chosen — the ring is a belt at the globe's
+ * own waist, so sending the poles in first lands them in a band that is still
+ * occupied. Peak share of drawn photograph area covered twice, over the whole
+ * morph, on the real 162: 3.7% this way, 12.1% with no wave at all, 39.3% the
+ * other way round. See `morphLocal` in shaders.ts.
+ *
+ * The amplitude was measured too — 0.15 gives 8.9%, 0.25 gives 5.3%, 0.35
+ * gives 3.7%, and past 0.4 it climbs again as the poles start arriving after
+ * the rows below them have already settled. A third of the morph is also about
+ * as long as a wave can be and still leave every photograph landed by the time
+ * `flatten` reaches 1: the last course starts at 0.345 and lands at 0.995.
+ */
+export const MORPH_RIPPLE = 0.35
+
+/** Outward excursion at the middle of a tile's crossing, world units, before
+ *  the per-tile scatter. Sub-tile on purpose: the globe should look like it
+ *  loosens, not like it explodes. */
+export const MORPH_BLOOM = 0.055
+
+/**
+ * The landing, world units. Larger than {@link MORPH_BLOOM}, which is what
+ * turns the excursion asymmetric: outward early, a shade *inside* the ring's
+ * radius late, then out to rest. A tile settles onto its slot instead of
+ * stopping on it. It is a radial motion only and so cannot disturb the joints —
+ * see `morphRadial` in shaders.ts.
+ */
+export const MORPH_SETTLE = 0.1
+
 /** Breaks ties in the tonal ordering below, so two photographs of the same
  *  average tone are not left in filename order (which clusters a shoot's frames
  *  together). 0 keeps the manifest order. */
@@ -124,9 +199,38 @@ type Placement = {
   /** `source[i]` is the index of `placed[i]` in the `photos` prop. */
   source: readonly number[]
   layout: TileLayout
+  /** Where each tile goes once the globe has opened out. */
+  ring: RingLayout
 }
 
+/** Placements already solved, keyed by the array they were solved from. The
+ *  band solver is not cheap and both the sphere and {@link ringFraming} want
+ *  the same answer for the same photographs. */
+const placements = new WeakMap<readonly Photo[], Placement>()
+
 function placePhotos(photos: readonly Photo[]): Placement {
+  const cached = placements.get(photos)
+  if (cached) return cached
+  const placement = solvePlacement(photos)
+  placements.set(photos, placement)
+  return placement
+}
+
+/**
+ * The finished ring's dimensions, in world units against {@link SPHERE_RADIUS}.
+ *
+ * What a scroll choreography needs in order to frame the end of the zoom on the
+ * *ring* rather than on the globe: the camera should stop where the ring's
+ * `height` fills the fraction of the viewport you want it to. Exported rather
+ * than written down as a number because it moves with the photo count, the row
+ * count and the ring radius, and a stale copy of it would frame the end state
+ * wrongly on the day any of those change.
+ */
+export function ringFraming(photos: readonly Photo[]): RingLayout {
+  return placePhotos(photos).ring
+}
+
+function solvePlacement(photos: readonly Photo[]): Placement {
   // Light frames toward the north pole, dark ones toward the south. The
   // courses are filled north to south from this order, so each one is a
   // narrow slice of tone and the globe shades along its own tilted axis.
@@ -135,7 +239,13 @@ function placePhotos(photos: readonly Photo[]): Placement {
     shuffledIndices(photos.length, PLACEMENT_SEED),
   )
   const placed = source.map((i) => photos[i])
-  return { placed, source, layout: layoutTiles(placed.map((p) => p.aspect)) }
+  const aspects = placed.map((p) => p.aspect)
+  const layout = layoutTiles(aspects)
+  // The ring's rows are contiguous runs of courses, and the courses are already
+  // in tonal order, so the ring shades top to bottom exactly as the globe shades
+  // pole to pole. The same photographs, in the same order, on a different shape.
+  const ring = planRing(layout, aspects, { radius: SPHERE_RADIUS * RING_RADIUS_SCALE })
+  return { placed, source, layout, ring }
 }
 
 export default function PhotoSphere({
@@ -156,11 +266,12 @@ export default function PhotoSphere({
   const spinRef = useRef<THREE.Group>(null)
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const ambientSpin = useRef(0)
+  const flattenRef = useRef(0)
 
   const placement = useMemo(() => placePhotos(photos), [photos])
 
   const geometry = useMemo(() => {
-    const { placed, layout } = placement
+    const { placed, layout, ring } = placement
     const base = new THREE.PlaneGeometry(1, 1, TILE_SEGMENTS, TILE_SEGMENTS)
 
     const uv = new Float32Array(layout.count * 4)
@@ -184,6 +295,9 @@ export default function PhotoSphere({
     base.setAttribute('iRot', new THREE.InstancedBufferAttribute(layout.rotations, 1))
     base.setAttribute('iSeed', new THREE.InstancedBufferAttribute(layout.seeds, 1))
     base.setAttribute('iUV', new THREE.InstancedBufferAttribute(uv, 4))
+    // Static: the destination is solved once, at layout time. Nothing about the
+    // morph is computed per frame on the CPU — one uniform moves all 162.
+    base.setAttribute('iSlot', new THREE.InstancedBufferAttribute(ring.slots, 4))
     base.setAttribute('iHidden', hidden)
     return base
   }, [placement, atlasKind, atlasSize])
@@ -200,6 +314,11 @@ export default function PhotoSphere({
           uRadius: { value: SPHERE_RADIUS },
           uRelief: { value: RELIEF },
           uOpacity: { value: 1 },
+          uFlatten: { value: 0 },
+          uRing: { value: SPHERE_RADIUS * RING_RADIUS_SCALE },
+          uRipple: { value: MORPH_RIPPLE },
+          uBloom: { value: MORPH_BLOOM },
+          uSettle: { value: MORPH_SETTLE },
         },
         // Tiles face outward, so the far half of the shell culls itself and the
         // gaps show the page instead of the backs of distant photographs.
@@ -231,24 +350,6 @@ export default function PhotoSphere({
   useEffect(() => () => geometry.dispose(), [geometry])
   useEffect(() => () => material.dispose(), [material])
 
-  // Publish the live sphere for the pointer hit test. Registered from an effect
-  // so the group refs are already populated, and matched by identity on the way
-  // out so StrictMode's double mount cannot leave a dead handle behind.
-  useEffect(() => {
-    const handle: SphereHandle = {
-      placement,
-      radius: SPHERE_RADIUS,
-      relief: RELIEF,
-      spin: spinRef,
-      camera,
-      canvas: gl.domElement,
-    }
-    liveSphere = handle
-    return () => {
-      if (liveSphere === handle) liveSphere = null
-    }
-  }, [placement, camera, gl])
-
   const baseDistance = useMemo(
     () =>
       distanceForViewportFraction(
@@ -260,6 +361,48 @@ export default function PhotoSphere({
       ),
     [size.width, size.height],
   )
+
+  /**
+   * Everything the morph needs that depends on the viewport, in one object so
+   * that this component and {@link NearTiles} derive the *same* number from the
+   * *same* inputs on the same frame. They compute it separately rather than
+   * passing it down: r3f runs a child's frame callback before its parent's, so
+   * a value handed down would arrive a frame late, and a near tile a frame
+   * behind its instanced twin is a visible shear during the morph.
+   */
+  const morph = useMemo<MorphSettings>(
+    () => ({
+      ring: placement.ring,
+      sinRestingLimb: SPHERE_RADIUS / baseDistance,
+      halfDiagonalFov: halfDiagonalFov(SPHERE_FOV, size.width, size.height),
+      ripple: reducedMotion ? 0 : MORPH_RIPPLE,
+      bloom: reducedMotion ? 0 : MORPH_BLOOM,
+      settle: reducedMotion ? 0 : MORPH_SETTLE,
+    }),
+    [placement.ring, baseDistance, size.width, size.height, reducedMotion],
+  )
+
+  // Publish the live sphere for the pointer hit test. Registered from an effect
+  // so the group refs are already populated, and matched by identity on the way
+  // out so StrictMode's double mount cannot leave a dead handle behind.
+  useEffect(() => {
+    const handle: SphereHandle = {
+      placement,
+      radius: SPHERE_RADIUS,
+      relief: RELIEF,
+      spin: spinRef,
+      camera,
+      canvas: gl.domElement,
+      morph,
+      // Written every frame below; read by the hit test, which has to work in
+      // whichever shape the shader last drew.
+      flatten: flattenRef,
+    }
+    liveSphere = handle
+    return () => {
+      if (liveSphere === handle) liveSphere = null
+    }
+  }, [placement, camera, gl, morph])
 
   useFrame((_, delta) => {
     const d = drive ?? sphereDrive
@@ -277,6 +420,13 @@ export default function PhotoSphere({
       d.offsetY ?? 0,
       baseDistance * (d.distanceScale ?? 1),
     )
+
+    const flatten = flattenFor(d, morph)
+    flattenRef.current = flatten
+    material.uniforms.uFlatten.value = flatten
+    material.uniforms.uRipple.value = morph.ripple
+    material.uniforms.uBloom.value = morph.bloom
+    material.uniforms.uSettle.value = morph.settle
 
     const opacity = d.opacity ?? 1
     material.uniforms.uOpacity.value = opacity
@@ -305,6 +455,7 @@ export default function PhotoSphere({
             nearTiles ??
             (atlasKind === 'mobile' ? NEAR_TILES_MOBILE : NEAR_TILES_DESKTOP)
           }
+          morph={morph}
           drive={drive}
           poseFor={nearTilePose}
         />
@@ -323,7 +474,18 @@ export default function PhotoSphere({
  * three.js's own raycast against this mesh returns nonsense, and the hit test
  * has to be done in the same coordinates the shader works in.
  *
- * Which is four steps, and no rasterisation:
+ * There are now two of those, because the shell opens out into a ring, so there
+ * are two tests. {@link pickPhotoAt} chooses between them on the morph amount
+ * the last frame was actually drawn at:
+ *
+ *   flatten < ½   the shell test below — exact, unchanged, and the only one
+ *                 that runs at the resting globe.
+ *   flatten ≥ ½   `pickOnRing` — the tile's four corners are interpolated with
+ *                 the identical arithmetic the vertex shader uses, so the test
+ *                 is exact at the finished ring and approximate only while the
+ *                 surface is still moving. See the note there.
+ *
+ * THE SHELL TEST is four steps, and no rasterisation:
  *
  *   1. Unproject the pointer to a world-space ray.
  *   2. Rotate the whole ray into the sphere's own frame, undoing the live tilt
@@ -360,6 +522,9 @@ type SphereHandle = {
   spin: RefObject<THREE.Group | null>
   camera: THREE.Camera
   canvas: HTMLCanvasElement
+  morph: MorphSettings
+  /** The morph amount the last frame was drawn at. */
+  flatten: RefObject<number>
 }
 
 /** The mounted sphere, or null. One at a time; the last to mount wins. */
@@ -409,16 +574,28 @@ const pickE2 = new THREE.Vector3()
 const PICK_COARSE_SLACK = 0.09
 
 /**
+ * Where the hit test hands over from the shell to the ring.
+ *
+ * Half way, because that is where the tile is half way: below it the surface is
+ * still recognisably a sphere and the exact shell test is the better model,
+ * above it the ring test is — and it becomes exact as the morph finishes. The
+ * hand-over is where both are at their least accurate, which is also the one
+ * moment nobody is clicking: it is the middle of a scroll.
+ */
+const PICK_RING_FROM = 0.5
+
+/**
  * The photograph under a pointer position, in client (viewport) coordinates —
  * i.e. straight from a PointerEvent's `clientX`/`clientY`.
  *
  * Returns null when the sphere is not mounted, when the pointer is outside the
- * canvas, when the ray misses the shell entirely, and when it lands on a joint
- * between two photographs. Works at any zoom and while the sphere is spinning:
- * the orientation is read from the scene graph on every call.
+ * canvas, when the ray misses the surface entirely, and when it lands on a joint
+ * between two photographs. Works at any zoom, in either shape and anywhere
+ * between them, and while the surface is turning: the orientation and the morph
+ * amount are both read at the moment of the call.
  *
- * Cheap enough to call on `pointermove` — one ray, 162 dot products, and the
- * full test on the handful of tiles that survive it. Nothing is allocated.
+ * Cheap enough to call on `pointermove` — one ray and 162 tiles, with no
+ * rasterisation and nothing allocated.
  */
 export function pickPhotoAt(clientX: number, clientY: number): PhotoPick | null {
   const live = liveSphere
@@ -439,6 +616,17 @@ export function pickPhotoAt(clientX: number, clientY: number): PhotoPick | null 
 
   pickPointer.set(nx * 2 - 1, 1 - ny * 2)
   pickRaycaster.setFromCamera(pickPointer, live.camera)
+
+  const flatten = live.flatten.current
+  return flatten < PICK_RING_FROM
+    ? pickOnShell(live)
+    : pickOnRing(live, spin, flatten)
+}
+
+/** The photograph under {@link pickRaycaster}'s ray, on the spherical shell. */
+function pickOnShell(live: SphereHandle): PhotoPick | null {
+  const spin = live.spin.current
+  if (!spin) return null
 
   // Take the ray into the sphere's frame once, rather than taking every hit
   // point back out of it. The groups only ever rotate, so the direction stays
@@ -521,6 +709,179 @@ export function pickPhotoAt(clientX: number, clientY: number): PhotoPick | null 
     bestTile = i
     bestU = theta / (2 * halfU) + 0.5
     bestV = 0.5 - phi / (2 * halfV)
+  }
+
+  if (bestTile < 0) return null
+  return {
+    photo: placed[bestTile],
+    index: source[bestTile],
+    tile: bestTile,
+    u: bestU,
+    v: bestV,
+  }
+}
+
+/* ── The ring test ──────────────────────────────────────────────────────────
+   Once the globe has opened out there is no shell to intersect, so the analytic
+   surface is gone and the test has to be built from the tiles themselves.
+
+   Each tile is rebuilt in view space from its centre and its two half-axes,
+   using the *same* three functions the vertex shader uses to decide where it is
+   — morphLocal, morphEase, morphRadial, mirrored in sphereMath.ts — and the ray
+   is solved against that parallelogram directly. A 3×3 Cramer per tile, no
+   allocation, and the α,β that fall out of it are the tile's own u,v.
+
+   Exact at the finished ring, where a tile *is* a parallelogram to within the
+   0.3% its bend around the cylinder costs. Approximate while the surface is
+   still moving, because a tile mid-morph is a curved patch and this flattens
+   it: the error is the patch's sagitta, well under a tile, so a click near the
+   middle of a photograph is always right and one within a hair of a joint can
+   go to the neighbour. Nothing is ever silently attributed to a photograph
+   somewhere else on the surface, which was the failure to avoid.               */
+
+const pickModelView = new THREE.Matrix4()
+const pickViewOrigin = new THREE.Vector3()
+const pickViewDir = new THREE.Vector3()
+const pickShellCenter = new THREE.Vector3()
+const pickShellU = new THREE.Vector3()
+const pickShellV = new THREE.Vector3()
+const pickRingCenter = new THREE.Vector3()
+const pickRingU = new THREE.Vector3()
+const pickRingV = new THREE.Vector3()
+const pickQuadCenter = new THREE.Vector3()
+const pickQuadU = new THREE.Vector3()
+const pickQuadV = new THREE.Vector3()
+const pickToTile = new THREE.Vector3()
+const pickCross = new THREE.Vector3()
+
+/** The point on the shell at `quad`, in the sphere's own frame. Mirrors
+ *  `tilePlacement` in shaders.ts, including the pole guard. */
+function shellPointAt(
+  out: THREE.Vector3,
+  center: THREE.Vector3,
+  halfU: number,
+  halfV: number,
+  roll: number,
+  radius: number,
+  quadX: number,
+  quadY: number,
+): THREE.Vector3 {
+  const polar = Math.abs(center.y) > 0.99
+  pickRefAxis.set(polar ? 1 : 0, polar ? 0 : 1, 0)
+  pickTangent.copy(pickRefAxis).cross(center).normalize()
+  pickBitangent.copy(center).cross(pickTangent)
+  const ca = Math.cos(roll)
+  const sa = Math.sin(roll)
+  pickE1.copy(pickTangent).multiplyScalar(ca).addScaledVector(pickBitangent, sa)
+  pickE2.copy(pickTangent).multiplyScalar(-sa).addScaledVector(pickBitangent, ca)
+  return out
+    .copy(center)
+    .addScaledVector(pickE1, Math.tan(quadX * 2 * halfU))
+    .addScaledVector(pickE2, Math.tan(quadY * 2 * halfV))
+    .normalize()
+    .multiplyScalar(radius)
+}
+
+/** The photograph under {@link pickRaycaster}'s ray, once the globe has begun
+ *  to open out. See the block above. */
+function pickOnRing(
+  live: SphereHandle,
+  spin: THREE.Group,
+  flatten: number,
+): PhotoPick | null {
+  const { placed, source, layout } = live.placement
+  const { centers, sizes, rotations, seeds, count } = layout
+  const { ring, ripple, bloom, settle } = live.morph
+  const slots = ring.slots
+
+  // The shader's own frame, to the letter: the model-view matrix, the sphere's
+  // centre out of its translation column, and the camera-facing meridian out of
+  // the third row of its rotation.
+  pickModelView.multiplyMatrices(live.camera.matrixWorldInverse, spin.matrixWorld)
+  const mv = pickModelView.elements
+  const originX = mv[12]
+  const originY = mv[13]
+  const originZ = mv[14]
+  const frontLon = Math.atan2(mv[10], mv[2])
+  const axisZ = originZ + live.radius - ring.radius
+
+  // The ray, in view space. For a perspective camera the origin is the eye, but
+  // it is transformed rather than assumed so an offset or orthographic camera
+  // would still be handled correctly.
+  pickViewOrigin.copy(pickRaycaster.ray.origin).applyMatrix4(live.camera.matrixWorldInverse)
+  pickViewDir
+    .copy(pickRaycaster.ray.origin)
+    .add(pickRaycaster.ray.direction)
+    .applyMatrix4(live.camera.matrixWorldInverse)
+    .sub(pickViewOrigin)
+    .normalize()
+
+  let bestTile = -1
+  let bestDepth = Number.POSITIVE_INFINITY
+  let bestU = 0
+  let bestV = 0
+
+  for (let i = 0; i < count; i++) {
+    const seed = seeds[i]
+    const local = morphLocal(flatten, ripple, centers[i * 3 + 1])
+    const ease = morphEase(local)
+    const radial = morphRadial(local, seed, bloom, settle)
+
+    // Where the shell would have put it.
+    pickCenter.set(centers[i * 3], centers[i * 3 + 1], centers[i * 3 + 2]).normalize()
+    const halfU = sizes[i * 2]
+    const halfV = sizes[i * 2 + 1]
+    const roll = rotations[i]
+    const shellRadius = live.radius * (1 + live.relief * (seed * 2 - 1)) + radial
+    shellPointAt(pickShellCenter, pickCenter, halfU, halfV, roll, shellRadius, 0, 0)
+    shellPointAt(pickShellU, pickCenter, halfU, halfV, roll, shellRadius, 0.5, 0)
+    shellPointAt(pickShellV, pickCenter, halfU, halfV, roll, shellRadius, 0, 0.5)
+    pickShellCenter.applyMatrix4(pickModelView)
+    pickShellU.applyMatrix4(pickModelView).sub(pickShellCenter)
+    pickShellV.applyMatrix4(pickModelView).sub(pickShellCenter)
+
+    // …and where the ring puts it.
+    const angle = slots[i * 4] + frontLon
+    const slotY = slots[i * 4 + 1]
+    const slotHalfAngle = slots[i * 4 + 2]
+    const slotHalfHeight = slots[i * 4 + 3]
+    const ringRadius = ring.radius * (1 + live.relief * (seed * 2 - 1)) + radial
+    pickRingCenter.set(
+      originX + ringRadius * Math.sin(angle),
+      originY + slotY,
+      axisZ + ringRadius * Math.cos(angle),
+    )
+    pickRingU.set(
+      ringRadius * Math.sin(angle + slotHalfAngle) - ringRadius * Math.sin(angle),
+      0,
+      ringRadius * Math.cos(angle + slotHalfAngle) - ringRadius * Math.cos(angle),
+    )
+    pickRingV.set(0, slotHalfHeight, 0)
+
+    pickQuadCenter.lerpVectors(pickShellCenter, pickRingCenter, ease)
+    pickQuadU.lerpVectors(pickShellU, pickRingU, ease)
+    pickQuadV.lerpVectors(pickShellV, pickRingV, ease)
+
+    // Solve  α·U + β·V + γ·D = origin − centre  by Cramer, and read the hit off
+    // it: α and β are the tile's own coordinates, in [−1, 1], and −γ is the
+    // distance along the ray.
+    pickToTile.subVectors(pickViewOrigin, pickQuadCenter)
+    pickCross.crossVectors(pickQuadV, pickViewDir)
+    const det = pickQuadU.dot(pickCross)
+    if (Math.abs(det) < 1e-12) continue
+    const alpha = pickToTile.dot(pickCross) / det
+    if (alpha < -1 || alpha > 1) continue
+    pickCross.crossVectors(pickToTile, pickViewDir)
+    const beta = pickQuadU.dot(pickCross) / det
+    if (beta < -1 || beta > 1) continue
+    pickCross.crossVectors(pickQuadV, pickToTile)
+    const depth = -(pickQuadU.dot(pickCross) / det)
+    if (depth <= 0 || depth >= bestDepth) continue
+
+    bestDepth = depth
+    bestTile = i
+    bestU = alpha / 2 + 0.5
+    bestV = 0.5 - beta / 2
   }
 
   if (bestTile < 0) return null

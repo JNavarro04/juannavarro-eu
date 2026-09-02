@@ -70,21 +70,173 @@ const TILE_PLACEMENT_GLSL = /* glsl */ `
   }
 `
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  THE MORPH — the globe opening out into a ring
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * One number, `uFlatten`, runs from the sphere at 0 to the cylinder at 1, and
+ * every tile is somewhere between the two on every frame. Nothing switches.
+ *
+ * The ring is built in VIEW space, not in the sphere's. That is the whole
+ * argument for uprightness: a tile's vertical edge is written as the view's own
+ * Y axis, and a direction perpendicular to the view axis projects to a vertical
+ * line on screen wherever it sits in the frame. So at flatten 1 every
+ * photograph has *exactly* zero roll — not nearly zero, and not zero only at
+ * the centre of the frame. It also settles what happens to the 20° band tilt:
+ * that tilt lives in the model matrix, the ring term never reads the model
+ * matrix, so the courses' lean unwinds to level as the mix crosses over. There
+ * is no separate tilt to interpolate; it is gone because the ring is not
+ * attached to the sphere's axis.
+ *
+ * Two things are read straight out of `modelViewMatrix`, which costs nothing and
+ * keeps the two shader programs in exact agreement with each other and with the
+ * scene graph on every frame:
+ *
+ *   origin — the sphere's centre in view space, `modelViewMatrix[3].xyz`, since
+ *            the groups above this mesh only ever rotate. The ring hangs off it,
+ *            so the ring is where the globe was.
+ *   front  — the local direction that maps to view +Z, i.e. the third row of the
+ *            rotation. It is the meridian facing the camera, so the ring turns
+ *            with the drag and with the ambient spin *because it is driven by
+ *            the same angle the globe is*. The hand-over of rotation is not
+ *            interpolated; there is only ever one rotation.
+ */
+const MORPH_PLACEMENT_GLSL = /* glsl */ `
+  /**
+   * The morph's own clock, for one tile.
+   *
+   * Nothing moves on a single schedule: a tile's start is delayed in proportion
+   * to how near the poles it is, so the wave begins at the equator and runs
+   * outward to both poles, and at half way some photographs have taken their
+   * place in the ring while others are still lying on the shell.
+   *
+   * That direction is not a taste. The ring is a belt around the globe's own
+   * waist, so every photograph is converging on the latitudes the equatorial
+   * courses already occupy — and if the poles go first they arrive into a band
+   * that is still full. Measured over the whole morph, on the real 162, as the
+   * share of drawn photograph area covered twice at the worst moment:
+   *
+   *     equator first   3.7%      ← this
+   *     no wave        12.1%
+   *     poles first    39.3%
+   *
+   * Running it from the equator outward means the waist has emptied into the
+   * rows before the caps fold in after it, and it is also the direction that
+   * keeps the surface *coherent*: at the shipped ring radius the equatorial
+   * tiles barely leave the shell — they slide along it into the belt — so what
+   * the visitor sees is a globe gathering itself into a ring rather than 162
+   * photographs flying between two arrangements.
+   *
+   * 'ripple' 0 removes the wave and leaves a single schedule for everything,
+   * which is what prefers-reduced-motion asks for.
+   */
+  float morphLocal(float flatten, float ripple, float centerY) {
+    float delay = ripple * abs(centerY);
+    return clamp((flatten - delay) / max(1e-4, 1.0 - ripple), 0.0, 1.0);
+  }
+
+  /** Smootherstep: a tile accelerates out of the shell and decelerates into its
+   *  slot, with zero velocity *and* zero acceleration at both ends. */
+  float morphEase(float l) {
+    return l * l * l * (l * (l * 6.0 - 15.0) + 10.0);
+  }
+
+  /**
+   * The radial excursion, world units. Zero at both ends of the morph, so
+   * neither the globe nor the ring is touched by it.
+   *
+   * sin(πl)·(bloom + settle·cos(πl)) is one term doing two jobs. Early, cos is
+   * positive and the tile is pushed *out*: the globe loosens and expands before
+   * it opens. Late, cos has gone negative and — with settle larger than bloom —
+   * the tile passes slightly *inside* its final radius and comes back out to it,
+   * so it lands rather than stops.
+   *
+   * It is radial, and that is deliberate: it moves a tile along its own normal
+   * and never across the surface, so it cannot change which tile is beside which
+   * and cannot open or close a joint. The overshoot is provably incapable of
+   * causing an overlap in the finished ring. The per-tile scatter is there so
+   * that two tiles converging on the same row cross at different depths and the
+   * nearer simply covers the further, instead of the two z-fighting.
+   */
+  float morphRadial(float l, float seed, float bloom, float settle) {
+    float phase = 3.141592653589793 * l;
+    return sin(phase) * (bloom + settle * cos(phase)) * (0.7 + 0.6 * seed);
+  }
+
+  /**
+   * Where a tile's vertex sits on the ring, in view space.
+   *
+   * @param slot   ring angle, centre height, angular half-width, world half-height
+   * @param quad   position.xy of this vertex, spanning [-0.5, 0.5]
+   * @param origin the sphere's centre, view space
+   * @param front  the local direction facing the camera
+   *
+   * The tile is bent around the cylinder rather than hung flat against it, for
+   * the same reason the sphere's tiles are bent around the shell: neighbours
+   * meet flush and the silhouette is a true circle. At ~9° of arc per frame the
+   * bend is 0.3% of the radius — the curvature the viewer reads is the ring's,
+   * not the tile's.
+   */
+  vec3 ringPlacement(
+    vec4 slot,
+    vec2 quad,
+    float ringRadius,
+    float sphereRadius,
+    float relief,
+    float seed,
+    float radial,
+    vec3 origin,
+    vec3 front
+  ) {
+    float angle = slot.x + atan(front.z, front.x) + quad.x * 2.0 * slot.z;
+    float r = ringRadius * (1.0 + relief * (seed * 2.0 - 1.0)) + radial;
+    // The near face is pinned to the sphere's near point, so the photograph at
+    // the centre of the frame keeps its depth — and therefore its size on screen
+    // — right through the morph. The camera's dolly goes on meaning the same
+    // thing before and after.
+    float axisZ = origin.z + sphereRadius - ringRadius;
+    return vec3(
+      origin.x + r * sin(angle),
+      origin.y + slot.y + quad.y * 2.0 * slot.w,
+      axisZ + r * cos(angle)
+    );
+  }
+
+  /** The sphere's centre in view space. The groups above only rotate, so the
+   *  model matrix contributes no translation of its own. */
+  vec3 morphOrigin(mat4 modelView) {
+    return modelView[3].xyz;
+  }
+
+  /** The local direction that maps to view +Z: the meridian facing the camera. */
+  vec3 morphFront(mat4 modelView) {
+    return normalize(vec3(modelView[0][2], modelView[1][2], modelView[2][2]));
+  }
+`
+
 export const sphereVertexShader = /* glsl */ `
   attribute vec3 iCenter;   // unit direction of this tile's centre
   attribute vec2 iSize;     // angular half-extents (radians), tile u then v
   attribute vec4 iUV;       // atlas rect: origin xy, extent zw, normalised
+  attribute vec4 iSlot;     // ring slot: angle, height, angular half-width, half-height
   attribute float iRot;     // tile rotation within its tangent plane
   attribute float iSeed;    // per-tile random, [0,1)
   attribute float iHidden;  // 1 while NearTiles owns this photograph
 
   uniform float uRadius;
   uniform float uRelief;
+  uniform float uFlatten;   // 0 = the globe, 1 = the ring
+  uniform float uRing;      // ring radius, world units
+  uniform float uRipple;    // head start given to the poles, in flatten units
+  uniform float uBloom;     // outward excursion mid-morph, world units
+  uniform float uSettle;    // overshoot-and-settle at the end, world units
 
   varying vec2 vUv;
   varying vec4 vRect;
 
   ${TILE_PLACEMENT_GLSL}
+  ${MORPH_PLACEMENT_GLSL}
 
   void main() {
     vUv = uv;
@@ -101,9 +253,28 @@ export const sphereVertexShader = /* glsl */ `
     }
 
     vec3 dir = tilePlacement(iCenter, iSize, iRot, position.xy);
-    gl_Position =
-      projectionMatrix * modelViewMatrix *
-      vec4(dir * tileRadius(uRadius, uRelief, iSeed), 1.0);
+
+    // The resting globe, untouched — not merely mix()ed with a weight of zero.
+    // This is the state the client signed off; it does not depend on a single
+    // line of the maths below being right.
+    if (uFlatten <= 0.0) {
+      gl_Position =
+        projectionMatrix * modelViewMatrix *
+        vec4(dir * tileRadius(uRadius, uRelief, iSeed), 1.0);
+      return;
+    }
+
+    float local = morphLocal(uFlatten, uRipple, iCenter.y);
+    float radial = morphRadial(local, iSeed, uBloom, uSettle);
+
+    vec4 shell =
+      modelViewMatrix * vec4(dir * (tileRadius(uRadius, uRelief, iSeed) + radial), 1.0);
+    vec3 ring = ringPlacement(
+      iSlot, position.xy, uRing, uRadius, uRelief, iSeed, radial,
+      morphOrigin(modelViewMatrix), morphFront(modelViewMatrix)
+    );
+
+    gl_Position = projectionMatrix * mix(shell, vec4(ring, 1.0), morphEase(local));
   }
 `
 
@@ -149,21 +320,48 @@ export const sphereFragmentShader = /* glsl */ `
 export const nearTileVertexShader = /* glsl */ `
   uniform vec3 uCenter;
   uniform vec2 uSize;
+  uniform vec4 uSlot;
   uniform float uRot;
   uniform float uSeed;
   uniform float uRadius;
   uniform float uRelief;
+  uniform float uFlatten;
+  uniform float uRing;
+  uniform float uRipple;
+  uniform float uBloom;
+  uniform float uSettle;
 
   varying vec2 vUv;
 
   ${TILE_PLACEMENT_GLSL}
+  ${MORPH_PLACEMENT_GLSL}
 
   void main() {
     vUv = uv;
     vec3 dir = tilePlacement(uCenter, uSize, uRot, position.xy);
-    gl_Position =
-      projectionMatrix * modelViewMatrix *
-      vec4(dir * tileRadius(uRadius, uRelief, uSeed), 1.0);
+
+    if (uFlatten <= 0.0) {
+      gl_Position =
+        projectionMatrix * modelViewMatrix *
+        vec4(dir * tileRadius(uRadius, uRelief, uSeed), 1.0);
+      return;
+    }
+
+    // Bit for bit the instanced program's arithmetic, on the same inputs. A
+    // photograph that is being drawn from its own file has to sit exactly where
+    // its instanced twin would have: any disagreement here would show as the
+    // sharp tiles fanning while everything around them straightened.
+    float local = morphLocal(uFlatten, uRipple, uCenter.y);
+    float radial = morphRadial(local, uSeed, uBloom, uSettle);
+
+    vec4 shell =
+      modelViewMatrix * vec4(dir * (tileRadius(uRadius, uRelief, uSeed) + radial), 1.0);
+    vec3 ring = ringPlacement(
+      uSlot, position.xy, uRing, uRadius, uRelief, uSeed, radial,
+      morphOrigin(modelViewMatrix), morphFront(modelViewMatrix)
+    );
+
+    gl_Position = projectionMatrix * mix(shell, vec4(ring, 1.0), morphEase(local));
   }
 `
 

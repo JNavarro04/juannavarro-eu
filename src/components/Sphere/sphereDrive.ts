@@ -44,6 +44,21 @@ export type SphereDrive = {
   tilt: number
   /** 0–1 fade for the whole sphere. Below 1 the tiles switch to blending. */
   opacity: number
+  /**
+   * How far the globe has opened out into the ring: 0 the sphere, 1 the
+   * cylinder of photographs. Everything between is a live morph — see the block
+   * comment in shaders.ts.
+   *
+   * `null` — the default — leaves the sphere to derive it from `distanceScale`,
+   * so a caller that only dollies the camera still gets the whole choreography.
+   * Write a number to take it over, which is the better arrangement once the
+   * scroll owns a progress value: the morph is then in step with the camera by
+   * construction rather than by two curves agreeing about a distance.
+   *
+   * It must stay a pure function of scroll position and nothing else, or
+   * scrolling back out will not retrace the way in.
+   */
+  flatten: number | null
 }
 
 export const SPHERE_DRIVE_DEFAULTS: SphereDrive = {
@@ -54,6 +69,7 @@ export const SPHERE_DRIVE_DEFAULTS: SphereDrive = {
   spin: 0,
   tilt: 0,
   opacity: 1,
+  flatten: null,
 }
 
 /** The shared, mutable drive. Mutate it; do not replace it. */

@@ -91,6 +91,19 @@ export const STOP_COVER = 1
 
 /** Never closer than this, in sphere radii. The client chose to stay outside the
  *  shell looking at the convex face; this is the guard rail that keeps it so. */
+/** How much of the viewport height the ring's belt should fill at the stop. */
+export const RING_VIEWPORT_FRACTION = 0.72
+
+/** Scroll progress over which the sphere becomes the cylinder. */
+export const MORPH_START = 0.34
+export const MORPH_END = 0.8
+
+/** Radians of extra longitude the camera swings while the globe opens. */
+export const ARC_SWING = 0.9
+
+/** Peak extra latitude (radians) mid-morph — the camera rises, then descends. */
+export const ARC_LIFT = 0.3
+
 export const MIN_STOP_DISTANCE = 1.34
 
 /** Never further than this at the stop, in sphere radii. Stops a very tall,
@@ -211,6 +224,13 @@ export type ViewGeometryInput = {
   fovDegrees: number
   /** VIEWPORT_FRACTION from PhotoSphere — how the resting framing is defined. */
   viewportFraction: number
+  /**
+   * The cylinder the sphere morphs into, from `ringFraming(PHOTOS)`. The stop
+   * has to frame the RING, not the globe: the globe's silhouette and the ring's
+   * belt want quite different distances, and framing the globe left phones with
+   * 92px photographs at the one moment they are meant to be readable.
+   */
+  ring?: { radius: number; height: number }
 }
 
 /**
@@ -234,8 +254,14 @@ export function viewGeometry(input: ViewGeometryInput): ViewGeometry {
   // Angular radius the silhouette should have at the stop, capped well short of
   // 90° — sin(limb) = radius/distance, so a limb near 90° is a camera on the skin.
   const limb = clamp(halfDiagonal * STOP_COVER, 0.05, 1.2)
+  // Frame the ring when we know it, the silhouette otherwise. On 16:9 the two
+  // agree to three decimals; on a portrait phone the ring form is what keeps
+  // the photographs legible instead of shrinking them to fit a globe.
   const stopDistance = clamp(
-    radius / Math.sin(limb),
+    input.ring
+      ? input.ring.radius +
+        input.ring.height / (2 * tanHalfFovY * RING_VIEWPORT_FRACTION)
+      : radius / Math.sin(limb),
     radius * MIN_STOP_DISTANCE,
     radius * MAX_STOP_DISTANCE,
   )
@@ -344,6 +370,8 @@ export type ChoreoFrame = {
   spinScale: number
   /** 1 → 0 across the first breath of the zoom. For landing text. */
   textOpacity: number
+  /** Straight into `sphereDrive.flatten` — 0 is the globe, 1 the cylinder. */
+  flatten: number
 }
 
 /**
@@ -366,15 +394,23 @@ export function frameForProgress(
 ): ChoreoFrame {
   const p = clamp01(progress)
   const eased = smootherstep(p)
+  const flatten = smootherstep(clamp01((p - MORPH_START) / (MORPH_END - MORPH_START)))
 
   return {
     // Geometric, not linear: a dolly that covers 3× in distance reads as a
     // constant-rate zoom only if the *ratio* moves at a constant rate.
     distanceScale: Math.pow(geom.stopScale, eased),
-    spin: orbit.longitude,
-    tilt: clamp(orbit.latitude, -ORBIT_LATITUDE_LIMIT, ORBIT_LATITUDE_LIMIT),
+    // The camera arcs rather than dollying straight in: it swings around the
+    // globe as it opens, and rises then settles back to level.
+    spin: orbit.longitude + (reducedMotion ? 0 : ARC_SWING * eased),
+    // Orbit latitude is meaningless on a vertical-axis ring, so it is faded out
+    // as the ring forms; the lift is zero at both ends and peaks mid-morph.
+    tilt:
+      clamp(orbit.latitude, -ORBIT_LATITUDE_LIMIT, ORBIT_LATITUDE_LIMIT) * (1 - flatten) +
+      (reducedMotion ? 0 : ARC_LIFT * Math.sin(Math.PI * eased)),
     // Unprompted motion, and the only motion here nobody asked for: off.
     spinScale: reducedMotion ? 0 : 1 - smootherstep(p / SPIN_FADE_END),
     textOpacity: 1 - smootherstep(p / TEXT_FADE_END),
+    flatten,
   }
 }

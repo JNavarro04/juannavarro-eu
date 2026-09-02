@@ -727,6 +727,397 @@ function layoutBandTiles(
   return { count: n, centers, sizes, rotations, seeds }
 }
 
+/* ── The ring ───────────────────────────────────────────────────────────────
+   Where the photographs go when the globe opens out.
+
+   The sphere is thirteen courses of latitude; the ring is four rows about a
+   vertical axis. So this is not an unrolling — the photographs have to
+   *redistribute*, thirteen courses into four rows, and the whole design problem
+   is doing that without the surface reading as 162 frames swapping places.
+
+   Two rules keep it orderly, and between them they fix every slot:
+
+     ROW.     A row is a contiguous run of courses. The courses arrive sorted by
+              tone (see {@link tonalOrder}), so contiguous runs keep that sort:
+              the ring shades top to bottom exactly as the globe shaded pole to
+              pole. Which courses go in which row is chosen so the four rows come
+              out the same height — the same balance the band solver strikes
+              between its courses, for the same reason.
+
+     COLUMN.  Within a row, the frames keep their circular order in longitude.
+              A tile therefore lands at nearly the longitude it was already at,
+              and the row's order can never invert: the motion reads as three
+              courses interleaving into one row rather than as a shuffle.
+
+   The wrap is solved the way the band solver solves a course. Row heights and
+   tile widths are chosen so that the widths plus one joint each sum to exactly
+   2π of the ring, so the row closes on itself with no seam to hide and no
+   photograph repeated to cover one.                                           */
+
+export type RingLayoutOptions = {
+  /**
+   * How many rows the ring has.
+   *
+   * Fewer rows means more photographs per row, so each is smaller and more of
+   * them are on screen at once; more rows means larger frames and a taller
+   * ring. Four rows of ~40 is the shipped shape. Three works and is measured;
+   * it gives 54 per row, frames a quarter smaller, and a ring two thirds as
+   * tall.
+   */
+  rows: number
+  /**
+   * Ring radius, in the same world units as the sphere radius.
+   *
+   * This is the one number that sets how large a photograph is on the ring, and
+   * it does it by setting the circumference: a row has to fit its share of the
+   * 162 frames into 2π·radius, so a bigger ring means bigger frames and fewer of
+   * them across the viewport. At 1 — the sphere's own girth, which puts the
+   * ring's axis exactly through the globe's centre — the near face carries
+   * about eight photographs across a 16:9 frame and four across a phone's.
+   */
+  radius: number
+  /**
+   * The joint, as a fraction of a row's height.
+   *
+   * Not an absolute width, because the ring's frames are about half the height
+   * of the globe's and grout that did not shrink with them would read as a
+   * different surface. 0.135 is the globe's own ratio — joint 0.028 against a
+   * course 0.207 tall — so the white between two photographs is the same
+   * fraction of a photograph in both states.
+   */
+  jointRatio: number
+}
+
+/** The tunables for the ring. See {@link RingLayoutOptions}. */
+export const RING_LAYOUT_DEFAULTS: RingLayoutOptions = {
+  rows: 4,
+  radius: 1,
+  jointRatio: 0.028 / 0.207,
+}
+
+export type RingLayout = {
+  rows: number
+  radius: number
+  /** Half the height of a row, world units. Shared by every row. */
+  halfHeight: number
+  /** The joint, world units. The narrowest one laid; see {@link jointRange}. */
+  joint: number
+  /** Total height of the ring, world units. */
+  height: number
+  /** How many photographs are in each row. */
+  counts: number[]
+  /** Which row each tile ended up in. */
+  rowOf: number[]
+  /**
+   * Per tile, four floats: ring angle (radians, 0 = the tile that faces the
+   * camera when the sphere's own front meridian does), centre height (world
+   * units, relative to the ring's middle), angular half-width, and world
+   * half-height. This is the entire destination — the vertex shader needs
+   * nothing else.
+   */
+  slots: Float32Array
+  /** Narrowest and widest joint actually laid, world units. */
+  jointRange: [number, number]
+}
+
+const TAU = Math.PI * 2
+
+/** Fold an angle into [0, 2π). */
+function wrapTau(a: number): number {
+  const x = a % TAU
+  return x < 0 ? x + TAU : x
+}
+
+/** Fold an angle into (−π, π]. */
+export function wrapPi(a: number): number {
+  return a - TAU * Math.floor((a + Math.PI) / TAU)
+}
+
+/**
+ * Cut a run of weights into `rows` contiguous groups of the most equal weight.
+ *
+ * Exact, by dynamic programming — 162 photographs into four rows is 105k
+ * comparisons, which costs nothing, and a greedy cut would be arbitrary. The
+ * cost is the squared spread of the group weights, and a group's weight is what
+ * decides both its height and how much arc it has left over for its joints (see
+ * {@link planRing}), so minimising it is minimising the difference between one
+ * row's grout and the next's.
+ */
+function groupRuns(weights: readonly number[], rows: number): number[][] {
+  const m = weights.length
+  const groups = Math.max(1, Math.min(rows, m))
+  const prefix = new Float64Array(m + 1)
+  for (let i = 0; i < m; i++) prefix[i + 1] = prefix[i] + weights[i]
+  const mean = prefix[m] / groups
+
+  const INF = Number.POSITIVE_INFINITY
+  // best[g][i] — cost of covering the first i courses with g groups.
+  const best: number[][] = Array.from({ length: groups + 1 }, () =>
+    new Array<number>(m + 1).fill(INF),
+  )
+  const cut: number[][] = Array.from({ length: groups + 1 }, () =>
+    new Array<number>(m + 1).fill(0),
+  )
+  best[0][0] = 0
+  for (let g = 1; g <= groups; g++) {
+    for (let i = g; i <= m; i++) {
+      for (let j = g - 1; j < i; j++) {
+        if (best[g - 1][j] === INF) continue
+        const w = prefix[i] - prefix[j]
+        const cost = best[g - 1][j] + (w - mean) * (w - mean)
+        if (cost < best[g][i]) {
+          best[g][i] = cost
+          cut[g][i] = j
+        }
+      }
+    }
+  }
+
+  const bounds: number[] = [m]
+  for (let g = groups, i = m; g > 0; g--) {
+    i = cut[g][i]
+    bounds.unshift(i)
+  }
+  const out: number[][] = []
+  for (let g = 0; g < groups; g++) {
+    const run: number[] = []
+    for (let k = bounds[g]; k < bounds[g + 1]; k++) run.push(k)
+    out.push(run)
+  }
+  return out
+}
+
+
+/**
+ * Where every photograph goes on the ring.
+ *
+ * The height falls out of the wrap, exactly as a course's height falls out of
+ * its circumference in the band solver. A row of `n` frames at half-height `hz`
+ * and native aspects `a` needs Σ2·a·hz of arc for the photographs and n joints
+ * of 2·`jointRatio`·hz between them, and that has to come to 2π·radius:
+ *
+ *     hz = π·radius / (Σa + n·jointRatio)
+ *
+ * One height is shared by all four rows so the ring is a grid rather than four
+ * independent strips, and it is taken from the *heaviest* row — the one that has
+ * to fit the most photograph into its 2π. Every other row then has arc left
+ * over, and that slack goes back into its joints, spread evenly. So a joint is
+ * never narrower than the chosen one and a frame can never overrun its
+ * neighbour: the same guarantee, and the same trade, the courses make.
+ */
+export function planRing(
+  layout: TileLayout,
+  aspects: readonly number[],
+  options: Partial<RingLayoutOptions> = {},
+): RingLayout {
+  const { rows, radius, jointRatio } = { ...RING_LAYOUT_DEFAULTS, ...options }
+  const n = layout.count
+  const slots = new Float32Array(n * 4)
+  const rowOf = new Array<number>(n).fill(0)
+
+  const aspectOf = (i: number): number => (aspects[i] > 0 ? aspects[i] : 1)
+
+  // A photograph's weight is what it costs a row to carry it: the arc it needs
+  // plus the arc of its one joint, both per unit of row height.
+  //
+  // The runs are cut in *placement* order, which is the order the courses were
+  // filled in — north to south, and therefore light to dark. So a row is a
+  // contiguous band of latitude and a contiguous band of tone at the same time,
+  // and cutting between two photographs rather than between two courses is what
+  // lets the four rows come out within a percent of each other instead of
+  // within fifty. It is the same freedom the band solver gives itself when it
+  // trades a photograph across a course boundary to even two courses out.
+  const weight = new Array<number>(n)
+  for (let i = 0; i < n; i++) weight[i] = aspectOf(i) + jointRatio
+
+  const members = groupRuns(weight, rows)
+  const rowWeight = members.map((row) => {
+    let sum = 0
+    for (const i of row) sum += weight[i]
+    return sum
+  })
+
+  // One height for every row, set by the row that has the least room to spare.
+  const heaviest = Math.max(...rowWeight, 1e-6)
+  const halfHeight = (Math.PI * radius) / heaviest
+  const joint = 2 * jointRatio * halfHeight
+  const pitch = 2 * halfHeight + joint
+  const height = members.length * 2 * halfHeight + (members.length - 1) * joint
+
+  let narrowest = Number.POSITIVE_INFINITY
+  let widest = 0
+
+  for (let r = 0; r < members.length; r++) {
+    const row = members[r]
+    if (row.length === 0) continue
+    // Rows top to bottom: row 0 is the brightest courses and sits highest.
+    const y = ((members.length - 1) / 2 - r) * pitch
+
+    // Longitude, as the ring sees it. The vertex shader places a tile at
+    // sin(slot + frontLongitude): the sphere's own screen-x runs the other way
+    // from longitude, so the ring angle a tile *wants* is −λ.
+    const want = new Map<number, number>()
+    for (const i of row) {
+      const c = layout.centers
+      want.set(i, wrapTau(-Math.atan2(c[i * 3 + 2], c[i * 3])))
+    }
+    const order = [...row].sort((a, b) => (want.get(a) ?? 0) - (want.get(b) ?? 0))
+
+    // Hand out the circle in proportion to arc, normalised so the row closes on
+    // itself exactly. Whatever this row could not spend — it is lighter than the
+    // heaviest — comes back as extra angle per joint, spread over every joint.
+    let demand = 0
+    for (const i of order) demand += 2 * aspectOf(i) * halfHeight
+    demand += order.length * joint
+    const perArc = (TAU * radius) / Math.max(1e-9, demand)
+    const jointAngle = (joint / radius) * perArc
+    narrowest = Math.min(narrowest, jointAngle * radius)
+    widest = Math.max(widest, jointAngle * radius)
+
+    const raw: number[] = []
+    let cursor = 0
+    for (const i of order) {
+      const half = (aspectOf(i) * halfHeight * perArc) / radius
+      raw.push(cursor + half + jointAngle / 2)
+      cursor += 2 * half + jointAngle
+    }
+
+    // Turn the whole row to where its photographs already are. The order is
+    // fixed; only the phase is free, and the phase that moves the row least is
+    // the circular mean of what each tile asked for against what it was given.
+    let sx = 0
+    let sy = 0
+    for (let t = 0; t < order.length; t++) {
+      const d = (want.get(order[t]) ?? 0) - raw[t]
+      sx += Math.cos(d)
+      sy += Math.sin(d)
+    }
+    const phase = Math.atan2(sy, sx)
+
+    for (let t = 0; t < order.length; t++) {
+      const i = order[t]
+      const half = (aspectOf(i) * halfHeight * perArc) / radius
+      rowOf[i] = r
+      slots[i * 4] = wrapPi(raw[t] + phase)
+      slots[i * 4 + 1] = y
+      slots[i * 4 + 2] = half
+      slots[i * 4 + 3] = halfHeight
+    }
+  }
+
+  return {
+    rows: members.length,
+    radius,
+    halfHeight,
+    joint,
+    height,
+    counts: members.map((row) => row.length),
+    rowOf,
+    slots,
+    jointRange: [
+      Number.isFinite(narrowest) ? narrowest : joint,
+      widest > 0 ? widest : joint,
+    ],
+  }
+}
+
+/* ── Camera → morph ─────────────────────────────────────────────────────────
+   How far along the sphere-to-ring morph the camera has taken us.               */
+
+/** Ken Perlin's smootherstep — zero first *and* second derivative at both ends. */
+export function smootherstep(x: number): number {
+  const t = x < 0 ? 0 : x > 1 ? 1 : x
+  return t * t * t * (t * (t * 6 - 15) + 10)
+}
+
+/**
+ * Where the morph starts and finishes, as a fraction of the way from the
+ * resting framing to the camera's stop. See {@link unrollAmount}.
+ */
+export const UNROLL_BEGIN = 0.12
+export const UNROLL_FULL = 0.84
+
+/* ── The morph, on the CPU ──────────────────────────────────────────────────
+   Line-for-line mirrors of the three functions the vertex shader runs. They
+   exist so the hit test can ask where a tile actually *is* halfway through the
+   morph, and so the maths can be measured without a renderer. If one of these
+   and its twin in shaders.ts ever disagree, a click lands on the wrong
+   photograph — they are checked against each other in the layout tests.       */
+
+/** The morph's clock for one tile. Mirrors `morphLocal` in shaders.ts. */
+export function morphLocal(flatten: number, ripple: number, centerY: number): number {
+  const delay = ripple * Math.abs(centerY)
+  const l = (flatten - delay) / Math.max(1e-4, 1 - ripple)
+  return l < 0 ? 0 : l > 1 ? 1 : l
+}
+
+/** Mirrors `morphEase` in shaders.ts. */
+export function morphEase(l: number): number {
+  return l * l * l * (l * (l * 6 - 15) + 10)
+}
+
+/** Mirrors `morphRadial` in shaders.ts. */
+export function morphRadial(
+  l: number,
+  seed: number,
+  bloom: number,
+  settle: number,
+): number {
+  const phase = Math.PI * l
+  return Math.sin(phase) * (bloom + settle * Math.cos(phase)) * (0.7 + 0.6 * seed)
+}
+
+/**
+ * Half the angle across a viewport's diagonal, radians.
+ *
+ * The sphere's own angular radius against this is what
+ * {@link unrollAmount} normalises by, and it is the same quantity the scroll
+ * choreography's STOP_COVER is expressed in.
+ */
+export function halfDiagonalFov(
+  fovYDegrees: number,
+  width: number,
+  height: number,
+): number {
+  const tanY = Math.tan((fovYDegrees * Math.PI) / 360)
+  const tanX = (tanY * Math.max(1, width)) / Math.max(1, height)
+  return Math.atan(Math.hypot(tanX, tanY))
+}
+
+/**
+ * The morph amount to use when nothing else is driving it.
+ *
+ * Not a function of `distanceScale` directly, because that number means
+ * something different on every screen: the camera's stop is derived from the
+ * viewport's diagonal, so the scale at the end of the scroll runs from about
+ * 0.28 on a wide desktop to 0.52 on a square window. A pair of fixed thresholds
+ * would either finish the morph in the first third of one screen's scroll or
+ * never finish it at all on another.
+ *
+ * So the input is the sphere's *angular* radius instead, measured against the
+ * viewport's half-diagonal — the same quantity the choreography's STOP_COVER
+ * names — and normalised so 0 is the resting globe and 1 is a sphere that fills
+ * the frame corner to corner. That lands the morph in the middle of the scroll
+ * on every viewport measured.
+ *
+ * @param distanceScale     the drive's camera scale; 1 is the resting globe.
+ * @param sinRestingLimb    radius / resting camera distance.
+ * @param halfDiagonalFov   half the viewport diagonal's field of view, radians.
+ */
+export function unrollAmount(
+  distanceScale: number,
+  sinRestingLimb: number,
+  halfDiagonalFov: number,
+): number {
+  const fov = Math.max(1e-4, halfDiagonalFov)
+  const rest = Math.asin(Math.min(1, Math.max(0, sinRestingLimb))) / fov
+  const now =
+    Math.asin(Math.min(1, Math.max(0, sinRestingLimb / Math.max(1e-4, distanceScale)))) / fov
+  const span = Math.max(1e-4, 1 - rest)
+  const t = (now - rest) / span
+  return smootherstep((t - UNROLL_BEGIN) / (UNROLL_FULL - UNROLL_BEGIN))
+}
+
 /**
  * Deterministic Fisher–Yates shuffle of an index list.
  *

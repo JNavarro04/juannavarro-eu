@@ -5,9 +5,11 @@ import {
   SPHERE_FOV,
   SPHERE_RADIUS,
   VIEWPORT_FRACTION,
+  ringFraming,
   sphereDrive,
 } from './Sphere'
 import type { SphereDrive } from './Sphere'
+import { PHOTOS } from '../lib/photos'
 import {
   CLICK_SLOP_PX,
   CLICK_SUPPRESS_MS,
@@ -34,6 +36,9 @@ import {
 } from '../lib/scrollChoreography'
 import type { OrbitState, ScrollLengths, ViewGeometry } from '../lib/scrollChoreography'
 import '../styles/choreography.css'
+
+/** The cylinder the sphere becomes. Fixed by the photo set, so measured once. */
+const RING = ringFraming(PHOTOS)
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -189,6 +194,7 @@ export default function ScrollChoreography({
       radius: SPHERE.radius,
       fovDegrees: SPHERE.fovDegrees,
       viewportFraction: SPHERE.viewportFraction,
+      ring: RING,
     })
     let lengths: ScrollLengths = scrollLengths(window.innerHeight)
 
@@ -242,6 +248,7 @@ export default function ScrollChoreography({
         radius: SPHERE.radius,
         fovDegrees: SPHERE.fovDegrees,
         viewportFraction: SPHERE.viewportFraction,
+        ring: RING,
       })
       lengths = scrollLengths(height)
       if (spacer) spacer.style.height = `${Math.round(lengths.spacerPx)}px`
@@ -525,6 +532,7 @@ export default function ScrollChoreography({
       target.spin = frame.spin
       target.tilt = frame.tilt
       target.spinScale = frame.spinScale
+      target.flatten = frame.flatten
       target.offsetX = 0
       target.offsetY = 0
       target.opacity = 1

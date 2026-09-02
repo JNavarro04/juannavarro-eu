@@ -43,7 +43,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 import type { Photo } from '../../types'
-import type { TileLayout } from '../../lib/sphereMath'
+import { unrollAmount, type RingLayout, type TileLayout } from '../../lib/sphereMath'
 import {
   acquireTileTexture,
   releaseTileTexture,
@@ -104,6 +104,52 @@ export const NEAR_SET_HYSTERESIS = 0.02
  *  replacements fade in. Below this, a fast orbit would cut tiles off mid-fade. */
 export const NEAR_SPARE_SLOTS = 6
 
+/* ── The morph seam ───────────────────────────────────────────────────────── */
+
+/**
+ * Everything about the sphere-to-ring morph that this component and its parent
+ * both need. See {@link flattenFor} for why it is shared rather than derived.
+ */
+export type MorphSettings = {
+  /** Where every photograph goes once the globe has opened out. */
+  ring: RingLayout
+  /** Sphere radius over the resting camera distance. */
+  sinRestingLimb: number
+  /** Half the viewport diagonal's field of view, radians. */
+  halfDiagonalFov: number
+  /** Head start given to the poles, in flatten units. 0 under reduced motion. */
+  ripple: number
+  /** Outward excursion mid-morph, world units. 0 under reduced motion. */
+  bloom: number
+  /** Overshoot-and-settle at the end, world units. 0 under reduced motion. */
+  settle: number
+}
+
+/**
+ * How far the globe has opened out, this frame.
+ *
+ * The drive's own value wins when it has one, so a scroll choreography can put
+ * the morph exactly where it wants it; otherwise it is derived from the camera
+ * distance. Both the instanced sphere and this component call it, on the same
+ * drive object, within the same frame — which is how the two shader programs
+ * are guaranteed to be looking at the same number rather than at two numbers
+ * that happen to agree.
+ */
+export function flattenFor(
+  drive: Partial<SphereDrive>,
+  morph: MorphSettings,
+): number {
+  const explicit = drive.flatten
+  if (explicit !== null && explicit !== undefined) {
+    return explicit < 0 ? 0 : explicit > 1 ? 1 : explicit
+  }
+  return unrollAmount(
+    drive.distanceScale ?? 1,
+    morph.sinRestingLimb,
+    morph.halfDiagonalFov,
+  )
+}
+
 /* ── The pose seam ────────────────────────────────────────────────────────── */
 
 /**
@@ -129,6 +175,10 @@ export type TilePose = {
   roll: number
   /** Per-tile random in [0,1), the relief input. */
   seed: number
+  /** Where this tile goes on the ring: angle, height, angular half-width,
+   *  world half-height. The other half of the placement — at flatten 1 it is
+   *  the only half that is read. */
+  slot: THREE.Vector4
 }
 
 export type NearTilesProps = {
@@ -149,6 +199,9 @@ export type NearTilesProps = {
   segments: number
   /** How many photographs may be drawn at full resolution at once. */
   maxTiles: number
+  /** The sphere-to-ring morph. Must be the parent's, or the two shader
+   *  programs will place the same photograph in two different places. */
+  morph: MorphSettings
   /** Overrides the shared {@link sphereDrive} singleton. */
   drive?: Partial<SphereDrive>
   /** Optional per-frame override of where a near tile is drawn. See {@link TilePose}. */
@@ -182,6 +235,7 @@ export default function NearTiles({
   relief,
   segments,
   maxTiles,
+  morph,
   drive,
   poseFor,
 }: NearTilesProps) {
@@ -209,6 +263,7 @@ export default function NearTiles({
         size: new THREE.Vector2(),
         roll: 0,
         seed: 0,
+        slot: new THREE.Vector4(),
       } as TilePose,
       best: [] as number[],
       bestScore: [] as number[],
@@ -253,6 +308,8 @@ export default function NearTiles({
     const slots = slotsRef.current
     const hiddenArray = hidden.array as Float32Array
     const { centers, sizes, rotations, seeds, count } = layout
+    const flatten = flattenFor(d, morph)
+    const ringSlots = morph.ring.slots
 
     // Hysteresis: come in below the activate scale, go out above the release one.
     activeRef.current = activeRef.current
@@ -287,11 +344,26 @@ export default function NearTiles({
         const cx = localCamera.x
         const cy = localCamera.y
         const cz = localCamera.z
+        // The meridian facing the camera — the same angle the vertex shader
+        // reads out of the model-view matrix, and the ring's own zero.
+        const lonFront = Math.atan2(cz, cx)
         for (let i = 0; i < count; i++) {
           const facing =
             cx * centers[i * 3] + cy * centers[i * 3 + 1] + cz * centers[i * 3 + 2]
-          if (facing < NEAR_MIN_FACING) continue
-          const score = held.has(i) ? facing + NEAR_SET_HYSTERESIS : facing
+          // On the shell, "nearest the camera" is how squarely a tile points at
+          // it. On the ring it is only the angle *around* the ring: all four
+          // rows are in frame at once, so the polar courses — which would never
+          // clear NEAR_MIN_FACING on the globe — are exactly as much in need of
+          // their own file as the equatorial ones. Blending the two by `flatten`
+          // means the upgraded set follows the photographs, not the geometry
+          // they used to be arranged on.
+          const near =
+            flatten <= 0
+              ? facing
+              : facing * (1 - flatten) +
+                Math.cos(ringSlots[i * 4] + lonFront) * flatten
+          if (near < NEAR_MIN_FACING) continue
+          const score = held.has(i) ? near + NEAR_SET_HYSTERESIS : near
           if (best.length >= maxTiles && score <= bestScore[best.length - 1]) continue
           let at = best.length
           while (at > 0 && bestScore[at - 1] < score) at -= 1
@@ -314,12 +386,23 @@ export default function NearTiles({
       pose.size.set(sizes[tile * 2], sizes[tile * 2 + 1])
       pose.roll = rotations[tile]
       pose.seed = seeds[tile]
+      pose.slot.set(
+        ringSlots[tile * 4],
+        ringSlots[tile * 4 + 1],
+        ringSlots[tile * 4 + 2],
+        ringSlots[tile * 4 + 3],
+      )
       if (poseFor) poseFor(tile, pose)
       const u = slot.material.uniforms
       ;(u.uCenter.value as THREE.Vector3).copy(pose.center)
       ;(u.uSize.value as THREE.Vector2).copy(pose.size)
+      ;(u.uSlot.value as THREE.Vector4).copy(pose.slot)
       u.uRot.value = pose.roll
       u.uSeed.value = pose.seed
+      u.uFlatten.value = flatten
+      u.uRipple.value = morph.ripple
+      u.uBloom.value = morph.bloom
+      u.uSettle.value = morph.settle
     }
 
     const free = (slot: Slot): void => {
@@ -342,11 +425,17 @@ export default function NearTiles({
           uTile: { value: null },
           uCenter: { value: new THREE.Vector3(0, 0, 1) },
           uSize: { value: new THREE.Vector2(0.1, 0.1) },
+          uSlot: { value: new THREE.Vector4() },
           uRot: { value: 0 },
           uSeed: { value: 0 },
           uRadius: { value: radius },
           uRelief: { value: relief },
           uOpacity: { value: 0 },
+          uFlatten: { value: 0 },
+          uRing: { value: morph.ring.radius },
+          uRipple: { value: morph.ripple },
+          uBloom: { value: morph.bloom },
+          uSettle: { value: morph.settle },
         },
         side: THREE.FrontSide,
         // Always blended: the crossfade needs it, and at full opacity the blend
@@ -450,7 +539,10 @@ export default function NearTiles({
       const rising = !slot.leaving && slot.ready
       slot.fade = clamp01(slot.fade + (rising ? step : -step))
 
-      if (poseFor && slot.ready) writePose(slot, tile)
+      // Every frame, not only when a caller is rewriting poses: the morph moves
+      // a tile continuously, and this is where a near tile is told where its
+      // instanced twin has got to.
+      if (slot.ready) writePose(slot, tile)
       slot.material.uniforms.uOpacity.value = slot.fade * globalOpacity
       slot.mesh.visible = slot.ready && slot.fade > 0.001
 
