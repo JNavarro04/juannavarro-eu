@@ -7,8 +7,10 @@ dist
 # Source photography — 1.2GB of originals. Build inputs only, never deployed.
 photos-src/
 
-# Generated derivatives (rebuild with `npm run assets`)
-public/p/
+# Generated derivatives ARE committed (57MB). They have to be: the 1.2GB of
+# originals in photos-src/ is not in the repo, so a CI build cannot regenerate
+# them. Without these the deployed site has no photographs at all.
+# Rebuild locally with `npm run assets` when the photo set changes.
 
 # Secrets
 .env
