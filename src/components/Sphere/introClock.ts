@@ -116,17 +116,6 @@ export const INTRO_ALPHA = 0.55
  */
 export const INTRO_SPIN_BOOST = 5
 
-/**
- * A gap in drawn frames longer than this completes the composition instead of
- * resuming it, seconds.
- *
- * The reason it exists: rendering stops when the sphere unmounts and when the
- * tab is backgrounded, and coming back to a half-composed globe that then
- * finishes would read as exactly the replay this must never do. Comfortably
- * longer than a dropped frame or React StrictMode's synchronous double mount,
- * both of which must be allowed to carry on.
- */
-export const INTRO_GAP_SECONDS = 0.4
 
 /**
  * How far a drive value must move off its resting reading before the visitor
@@ -241,12 +230,24 @@ export function introYields(
 
 let remaining = 1
 let lastStamp = -1
-let lastWall = -1
 
-/** Milliseconds, monotonic where it can be. Not imported from anywhere so that
- *  this module stays runnable outside a browser. */
-function wallClock(): number {
-  return typeof performance === 'undefined' ? Date.now() : performance.now()
+/**
+ * A tab sent to the background stops drawing, and would otherwise play the
+ * composition on return as though the page had just loaded. Finish it instead.
+ *
+ * This deliberately does NOT fire when the page loads already hidden: nothing
+ * has been drawn yet, `remaining` is still 1, and the right behaviour is to
+ * compose when the visitor first looks at the tab.
+ *
+ * An earlier version inferred this from a gap between rendered frames, which
+ * misfired on every cold load — the pause while a 1.9MB atlas decodes and the
+ * shaders compile is longer than any threshold short enough to be useful, so
+ * the composition completed on its second frame and read as a snap.
+ */
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && remaining < 1) remaining = 0
+  })
 }
 
 /** How much of the composition is still to come, without advancing it: 1 before
@@ -280,19 +281,13 @@ export function advanceIntro(stamp: number, delta: number, yielding: boolean): n
   if (remaining <= 0) return 0
   if (stamp === lastStamp) return remaining
 
-  const wall = wallClock()
-  if (lastWall >= 0 && wall - lastWall > INTRO_GAP_SECONDS * 1000) {
-    // Nothing was drawn for a while: the sphere was unmounted or the tab was in
-    // the background. Finish rather than resume — see INTRO_GAP_SECONDS.
-    remaining = 0
-  } else {
-    const frame =
-      delta > INTRO_MAX_FRAME_SECONDS ? INTRO_MAX_FRAME_SECONDS : delta > 0 ? delta : 0
-    const next = remaining - frame / (yielding ? INTRO_YIELD_SECONDS : INTRO_SECONDS)
-    remaining = next > 0 ? next : 0
-  }
+  // Clamped, so a long first frame — texture upload, shader compile — costs the
+  // composition one frame's worth of progress rather than most of its duration.
+  const frame =
+    delta > INTRO_MAX_FRAME_SECONDS ? INTRO_MAX_FRAME_SECONDS : delta > 0 ? delta : 0
+  const next = remaining - frame / (yielding ? INTRO_YIELD_SECONDS : INTRO_SECONDS)
+  remaining = next > 0 ? next : 0
 
   lastStamp = stamp
-  lastWall = wall
   return remaining
 }

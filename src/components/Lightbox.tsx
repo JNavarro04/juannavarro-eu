@@ -134,7 +134,8 @@ export default function Lightbox({
   const natW = natural?.w ?? 0
   const natH = natural?.h ?? 0
 
-  const caption = photo === null ? '' : photo.titled ? photo.title : exifLine(photo)
+  // Photographs carry no written titles; the caption is their EXIF or nothing.
+  const caption = photo === null ? '' : exifLine(photo)
   const hasCaption = caption.length > 0
   const counted = typeof index === 'number' && typeof total === 'number' && total > 0
   const position = counted ? `Photograph ${index} of ${total}` : 'Photograph'
@@ -475,9 +476,7 @@ export default function Lightbox({
   if (photo === null) return null
 
   const digits = counted && typeof total === 'number' ? String(total).length : 0
-  const alt = photo.titled
-    ? `${photo.title}. Photograph by ${SITE.name}.`
-    : `Untitled photograph by ${SITE.name}.`
+  const alt = `Photograph by ${SITE.name}.`
 
   return createPortal(
     <div className="lb" ref={rootRef}>
@@ -559,7 +558,7 @@ export default function Lightbox({
         <footer className="lb__bar lb__bar--bottom">
           {hasCaption ? (
             <p
-              className={`lb__caption lb__keep${photo.titled ? '' : ' lb__caption--meta'}`}
+              className="lb__caption lb__keep lb__caption--meta"
               id={captionId}
             >
               {caption}

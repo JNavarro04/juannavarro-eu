@@ -12,10 +12,6 @@ export type Photo = {
     camera?: string; lens?: string; focal?: string
     aperture?: string; shutter?: string; iso?: number; date?: string
   }
-  /** Juan's title, or a readable fallback derived from the id. */
-  title: string
-  /** True only when the title was written by hand. */
-  titled: boolean
   mid: string
   full: string
   atlas: { desktop: AtlasRect; mobile: AtlasRect }
