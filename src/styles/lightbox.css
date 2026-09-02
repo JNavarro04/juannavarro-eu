@@ -1,0 +1,348 @@
+/* ---------------------------------------------------------------------------
+   Lightbox — a photograph held up against the page.
+
+   The same discipline as contact.css: no card, no shadow, no radius, no
+   gradient. What differs is the ground. Contact draws an opaque sheet of ice
+   white down over everything; this one only frosts it, because the sphere has
+   to keep turning behind the photograph. So the scrim is a veil — translucent
+   ice white with a blur under it — and the photograph is the only opaque thing
+   on the screen.
+
+   Everything is scoped under .lb. This file shares a document with nav.css,
+   contact.css and pages.css and must never reach outside its own overlay.
+   --------------------------------------------------------------------------- */
+
+.lb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* dvh, not vh: on a phone the viewer must end where the browser chrome
+     begins, not underneath it. */
+  height: 100dvh;
+
+  /* Above the nav (100), below the contact overlay (300) — contact can open
+     over the page at any time and must always come out on top. */
+  z-index: 200;
+
+  color: var(--ink);
+  font-family: var(--font-sans);
+
+  /* Same gutter and top rhythm as .nav and .cf, so the close control lands on
+     the nav's baseline it is covering. */
+  --lb-gutter: clamp(1.25rem, 5vw, 5rem);
+  --lb-bar-y: clamp(1.1rem, 2.5vw, 1.9rem);
+  /* The margin around the photograph itself, on top of the gutter. This is a
+     gallery: the photograph is hung, not pasted over the wall. */
+  --lb-mount: clamp(0.75rem, 3vh, 2.75rem);
+  --lb-touch: 44px;
+}
+
+/* --- the veil ------------------------------------------------------------ */
+
+/*
+ * Deliberately translucent. Whatever is painting underneath — the sphere, its
+ * canvas, the nav — keeps painting and stays legible through this. Nothing is
+ * unmounted to open the viewer and nothing needs to be.
+ */
+.lb__scrim {
+  position: absolute;
+  inset: 0;
+  /* Literal first for anything without color-mix; the token drives the real
+     value. Both are var(--bg) at 72%. */
+  background: rgba(244, 246, 247, 0.72);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.08);
+  backdrop-filter: blur(20px) saturate(1.08);
+  animation: lb-veil 0.42s var(--ease) both;
+}
+
+@keyframes lb-veil {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --- the dialog ---------------------------------------------------------- */
+
+/*
+ * Fills the overlay, so any press that misses the photograph and the controls
+ * is a press on the backdrop. Three rows: a bar, the photograph, a bar.
+ */
+.lb__dialog {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding:
+    calc(var(--lb-bar-y) + env(safe-area-inset-top, 0px))
+    calc(var(--lb-gutter) + env(safe-area-inset-right, 0px))
+    calc(var(--lb-bar-y) + env(safe-area-inset-bottom, 0px))
+    calc(var(--lb-gutter) + env(safe-area-inset-left, 0px));
+  outline: none;
+  /* Vertical panning is pointless — the body is locked — and horizontal drags
+     belong to the viewer. Pinch to zoom a photograph still works. */
+  touch-action: pinch-zoom;
+}
+
+/* --- the two bars -------------------------------------------------------- */
+
+.lb__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--lb-touch);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.lb__bar--bottom {
+  gap: clamp(1rem, 4vw, 3rem);
+  padding-top: clamp(0.75rem, 2vh, 1.1rem);
+  border-top: 1px solid var(--line);
+}
+
+.lb__count {
+  margin: 0;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- close --------------------------------------------------------------- */
+
+/* Lifted wholesale from .cf__close so the two overlays close the same way. */
+.lb__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.3s var(--ease);
+}
+
+.lb__close:hover,
+.lb__close:focus-visible { color: var(--ink); }
+
+.lb__closeGlyph {
+  width: 11px;
+  height: 11px;
+  overflow: visible;
+  transition: transform 0.45s var(--ease);
+}
+
+.lb__closeGlyph line {
+  stroke: currentColor;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.lb__close:hover .lb__closeGlyph,
+.lb__close:focus-visible .lb__closeGlyph { transform: rotate(90deg); }
+
+/* --- the photograph ------------------------------------------------------ */
+
+/*
+ * min-* zeroed and overflow clipped: the frame is sized from this box by the
+ * component, and must never be able to push it back open.
+ */
+.lb__stage {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--lb-mount) 0;
+}
+
+/*
+ * Width and height come from the component, measured against the stage: the
+ * photograph's own aspect, never cropped, never larger than the pixels the
+ * file actually holds. The average colour underneath is what shows for the
+ * frame or two before the image is up — there is no spinner anywhere here.
+ */
+.lb__frame {
+  position: relative;
+  width: 0;
+  height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  animation: lb-lift 0.5s var(--ease) both;
+}
+
+@keyframes lb-lift {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lb__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The frame already carries the photograph's ratio; contain is the guard
+     against a rounded pixel, not the thing doing the fitting. */
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lb__img[data-loaded='true'] { opacity: 1; }
+
+/* --- caption ------------------------------------------------------------- */
+
+/*
+ * The title is only ever shown for a photograph Juan has actually named. The
+ * rest carry a generated placeholder, so they get their EXIF instead — which is
+ * a truth about the photograph rather than a stand-in for one.
+ */
+.lb__caption {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  text-transform: none;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.lb__caption--meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* --- prev / next --------------------------------------------------------- */
+
+.lb__steps {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.25rem, 1.5vw, 0.75rem);
+  margin-left: auto;
+  flex: none;
+}
+
+.lb__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lb-touch);
+  height: var(--lb-touch);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.3s var(--ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.lb__step:hover,
+.lb__step:focus-visible { color: var(--ink); }
+
+.lb__stepGlyph {
+  width: 12px;
+  height: 12px;
+  overflow: visible;
+  fill: none;
+  transition: transform 0.45s var(--ease);
+}
+
+.lb__stepGlyph polyline {
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+.lb__step:first-child:hover .lb__stepGlyph,
+.lb__step:first-child:focus-visible .lb__stepGlyph { transform: translateX(-2px); }
+
+.lb__step:last-child:hover .lb__stepGlyph,
+.lb__step:last-child:focus-visible .lb__stepGlyph { transform: translateX(2px); }
+
+/* --- focus --------------------------------------------------------------- */
+
+.lb__close:focus-visible,
+.lb__step:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.lb__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- narrow -------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+  .lb__bar--bottom {
+    /* The caption gets the width; the arrows drop under it rather than
+       squeezing it into a column two words wide. */
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .lb__caption {
+    flex: 1 1 100%;
+    font-size: var(--step-0);
+  }
+
+  .lb__steps { margin-left: -0.6rem; }
+}
+
+/* A phone on its side: almost no height to spare, so the bars give theirs up
+   and the photograph takes it. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .lb { --lb-bar-y: 0.6rem; --lb-mount: 0.5rem; }
+  .lb__caption { font-size: var(--step--1); }
+}
+
+/* --- reduced motion ------------------------------------------------------ */
+
+/* tokens.css already collapses every duration, which is right for transitions
+   but leaves anything that starts hidden depending on a 0.01ms animation to
+   reveal it. These put each of those into its finished state outright. */
+@media (prefers-reduced-motion: reduce) {
+  .lb__scrim { animation: none; opacity: 1; }
+
+  .lb__frame { animation: none; opacity: 1; transform: none; }
+
+  .lb__img { transition: none; opacity: 1; }
+
+  .lb__closeGlyph,
+  .lb__close:hover .lb__closeGlyph,
+  .lb__close:focus-visible .lb__closeGlyph,
+  .lb__stepGlyph,
+  .lb__step:hover .lb__stepGlyph,
+  .lb__step:focus-visible .lb__stepGlyph { transition: none; transform: none; }
+}
