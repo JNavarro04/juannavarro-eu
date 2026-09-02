@@ -10,7 +10,7 @@
   inset: 0 0 auto 0;
   z-index: 100;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: clamp(1.1rem, 2.5vw, 1.9rem) clamp(1.5rem, 6vw, 7rem);
@@ -22,10 +22,18 @@
 }
 
 .nav__mark {
+  /* The wordmark is the logo, not a nav link: it steps out of the monospace
+     link scale into the display serif so it reads as a mark. Line-height 1 and
+     self-alignment keep it on the links' baseline despite being much larger. */
   text-decoration: none;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 0.85rem + 1.6vw, 2.35rem);
+  letter-spacing: 0.045em;
+  line-height: 1;
+  text-transform: none;
   white-space: nowrap;
+  align-self: center;
 }
 
 .nav__mark-short { display: none; }
@@ -130,6 +138,7 @@
 
 @media (max-width: 520px) {
   .nav { font-size: 0.66rem; letter-spacing: 0.08em; --nav-glyph: 16px; }
+  .nav__mark { font-size: 1.2rem; letter-spacing: 0.03em; }
   .nav__mark { font-size: 0.66rem; }
   .nav__links { gap: 0.85rem; }
 }

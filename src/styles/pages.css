@@ -101,7 +101,8 @@
 }
 
 .mailto {
-  display: inline-block;
+  display: block;
+  width: fit-content;
   text-decoration: none;
   font-weight: 300;
   font-size: clamp(1.55rem, 0.4rem + 4.6vw, 5rem);
@@ -191,8 +192,11 @@
 }
 
 .write-cta {
-  display: inline-block;
-  margin-top: clamp(1.25rem, 3vh, 2rem);
+  /* Its own line, flush left under the address — inline-block parked it beside
+     the mailto and the two read as one crowded lump. */
+  display: block;
+  width: fit-content;
+  margin: clamp(1.75rem, 4vh, 2.75rem) 0 0 0;
   font-family: var(--font-mono);
   font-size: var(--step--1);
   letter-spacing: 0.12em;

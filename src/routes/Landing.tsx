@@ -1,6 +1,5 @@
 import { SphereStage } from '../components/Sphere'
 import ScrollChoreography from '../components/ScrollChoreography'
-import LandingTitle from '../components/LandingTitle'
 
 /**
  * The landing page is the sphere.
@@ -14,7 +13,6 @@ export default function Landing() {
   return (
     <main style={{ height: '100dvh', width: '100%' }}>
       <SphereStage />
-      <LandingTitle />
       <ScrollChoreography />
     </main>
   )
