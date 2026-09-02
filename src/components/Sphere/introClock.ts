@@ -57,7 +57,7 @@
    shape it.                                                                  */
 
 /** How long the composition takes, seconds, when nobody interrupts it. */
-export const INTRO_SECONDS = 1.6
+export const INTRO_SECONDS = 3
 
 /**
  * How long it takes to run out its remainder once the visitor has taken over.
@@ -82,7 +82,11 @@ export const INTRO_YIELD_SECONDS = 0.25
  * This is the taste knob. Raise it and the globe visibly gathers; past about
  * 0.2 the tiles start reading as separate objects flying in.
  */
-export const INTRO_LIFT = 0.12
+// 0.32 is the ceiling before the dispersed cloud clips: a tile's scatter peaks
+// at 1.3x the lift, so the widest radius is 1 + 0.32*1.3 = 1.416, which at
+// VIEWPORT_FRACTION 0.68 fills 96% of the frame's short axis. Past 0.4 the
+// first frames are cropped by the viewport.
+export const INTRO_LIFT = 0.32
 
 /**
  * The head start the equator gets over the poles, in composition-progress units.
