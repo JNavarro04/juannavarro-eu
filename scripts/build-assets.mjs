@@ -21,7 +21,7 @@ const SRC = join(ROOT, 'photos-src')
 const OUT = join(ROOT, 'public', 'p')
 const DATA = join(ROOT, 'src', 'data')
 
-const VARIANTS = { mid: 1200, full: 2400 }
+const VARIANTS = { mid: 1200, full: 1800 }
 const ATLASES = {
   desktop: { sheet: 4096, tile: 320 },
   mobile: { sheet: 2048, tile: 160 },
@@ -98,7 +98,7 @@ async function main() {
       const t = fit(w, h, max)
       await pipeline()
         .resize(t.w, t.h, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: name === 'full' ? 82 : 80, effort: 4 })
+        .webp({ quality: name === 'full' ? 75 : 80, effort: 4 })
         .toFile(join(OUT, name, `${slug}.webp`))
     }
 

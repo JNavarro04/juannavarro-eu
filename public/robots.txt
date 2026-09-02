@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://juannavarro.eu/sitemap.xml
