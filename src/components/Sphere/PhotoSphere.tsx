@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -9,9 +9,15 @@ import {
   layoutTiles,
   shuffledIndices,
   tonalOrder,
+  type TileLayout,
 } from '../../lib/sphereMath'
 import { sphereDrive, type SphereDrive } from './sphereDrive'
 import { sphereFragmentShader, sphereVertexShader } from './shaders'
+import NearTiles, {
+  NEAR_TILES_DESKTOP,
+  NEAR_TILES_MOBILE,
+  type TilePose,
+} from './NearTiles'
 import type { AtlasKind } from './useAtlasTexture'
 
 /* ── Tunables ───────────────────────────────────────────────────────────────
@@ -32,8 +38,10 @@ export const SPHERE_FOV = 35
 /** Diameter as a fraction of the viewport's smaller side. */
 export const VIEWPORT_FRACTION = 0.68
 
-/** Ambient spin, radians per second. */
-export const SPIN_SPEED = 0.028
+/** Ambient spin, radians per second. One turn takes about two and a half
+ *  minutes: fast enough that the globe is plainly alive on a first glance,
+ *  slow enough that a photograph can be looked at while it drifts. */
+export const SPIN_SPEED = 0.042
 
 /**
  * How far the courses rise, left to right, in degrees off horizontal on screen.
@@ -97,6 +105,37 @@ export type PhotoSphereProps = {
   drive?: Partial<SphereDrive>
   /** When true the sphere is drawn exactly as usual but never moves. */
   reducedMotion?: boolean
+  /** How many photographs may be drawn from their own file at full zoom.
+   *  Defaults to {@link NEAR_TILES_DESKTOP} / {@link NEAR_TILES_MOBILE}. */
+  nearTiles?: number
+  /** Per-frame override of where a near tile is drawn. See {@link TilePose}. */
+  nearTilePose?: (tile: number, pose: TilePose) => void
+}
+
+/* ── Placement ──────────────────────────────────────────────────────────────
+   Instance i draws `placed[i]`, which is NOT `photos[i]`: the photographs are
+   sorted by tone before they are laid out. `source[i]` is the index back into
+   the caller's array, and it is the only thing that makes the picking API below
+   return the photograph a visitor actually clicked on.                        */
+
+type Placement = {
+  /** The photographs in placement order. `placed[i]` is drawn by instance i. */
+  placed: readonly Photo[]
+  /** `source[i]` is the index of `placed[i]` in the `photos` prop. */
+  source: readonly number[]
+  layout: TileLayout
+}
+
+function placePhotos(photos: readonly Photo[]): Placement {
+  // Light frames toward the north pole, dark ones toward the south. The
+  // courses are filled north to south from this order, so each one is a
+  // narrow slice of tone and the globe shades along its own tilted axis.
+  const source = tonalOrder(
+    photos.map((p) => hexLuminance(p.color)),
+    shuffledIndices(photos.length, PLACEMENT_SEED),
+  )
+  const placed = source.map((i) => photos[i])
+  return { placed, source, layout: layoutTiles(placed.map((p) => p.aspect)) }
 }
 
 export default function PhotoSphere({
@@ -106,6 +145,8 @@ export default function PhotoSphere({
   atlasSize,
   drive,
   reducedMotion = false,
+  nearTiles,
+  nearTilePose,
 }: PhotoSphereProps) {
   const gl = useThree((s) => s.gl)
   const camera = useThree((s) => s.camera)
@@ -116,17 +157,11 @@ export default function PhotoSphere({
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const ambientSpin = useRef(0)
 
+  const placement = useMemo(() => placePhotos(photos), [photos])
+
   const geometry = useMemo(() => {
+    const { placed, layout } = placement
     const base = new THREE.PlaneGeometry(1, 1, TILE_SEGMENTS, TILE_SEGMENTS)
-    // Light frames toward the north pole, dark ones toward the south. The
-    // courses are filled north to south from this order, so each one is a
-    // narrow slice of tone and the globe shades along its own tilted axis.
-    const order = tonalOrder(
-      photos.map((p) => hexLuminance(p.color)),
-      shuffledIndices(photos.length, PLACEMENT_SEED),
-    )
-    const placed = order.map((i) => photos[i])
-    const layout = layoutTiles(placed.map((p) => p.aspect))
 
     const uv = new Float32Array(layout.count * 4)
     const inset = UV_INSET_PX / atlasSize
@@ -138,13 +173,22 @@ export default function PhotoSphere({
       uv[i * 4 + 3] = rect.h - inset * 2
     }
 
+    // 1 while a NearTiles mesh is drawing this photograph from its own file.
+    // Written every frame from that component; zero the rest of the time, which
+    // is what keeps the resting globe at a single draw call.
+    const hidden = new THREE.InstancedBufferAttribute(new Float32Array(layout.count), 1)
+    hidden.setUsage(THREE.DynamicDrawUsage)
+
     base.setAttribute('iCenter', new THREE.InstancedBufferAttribute(layout.centers, 3))
     base.setAttribute('iSize', new THREE.InstancedBufferAttribute(layout.sizes, 2))
     base.setAttribute('iRot', new THREE.InstancedBufferAttribute(layout.rotations, 1))
     base.setAttribute('iSeed', new THREE.InstancedBufferAttribute(layout.seeds, 1))
     base.setAttribute('iUV', new THREE.InstancedBufferAttribute(uv, 4))
+    base.setAttribute('iHidden', hidden)
     return base
-  }, [photos, atlasKind, atlasSize])
+  }, [placement, atlasKind, atlasSize])
+
+  const hidden = geometry.getAttribute('iHidden') as THREE.InstancedBufferAttribute
 
   const material = useMemo(
     () =>
@@ -186,6 +230,24 @@ export default function PhotoSphere({
 
   useEffect(() => () => geometry.dispose(), [geometry])
   useEffect(() => () => material.dispose(), [material])
+
+  // Publish the live sphere for the pointer hit test. Registered from an effect
+  // so the group refs are already populated, and matched by identity on the way
+  // out so StrictMode's double mount cannot leave a dead handle behind.
+  useEffect(() => {
+    const handle: SphereHandle = {
+      placement,
+      radius: SPHERE_RADIUS,
+      relief: RELIEF,
+      spin: spinRef,
+      camera,
+      canvas: gl.domElement,
+    }
+    liveSphere = handle
+    return () => {
+      if (liveSphere === handle) liveSphere = null
+    }
+  }, [placement, camera, gl])
 
   const baseDistance = useMemo(
     () =>
@@ -232,7 +294,241 @@ export default function PhotoSphere({
           // the unit quad's, not the shell's. Culling it by hand is wrong; skip it.
           frustumCulled={false}
         />
+        <NearTiles
+          photos={placement.placed}
+          layout={placement.layout}
+          hidden={hidden}
+          radius={SPHERE_RADIUS}
+          relief={RELIEF}
+          segments={TILE_SEGMENTS}
+          maxTiles={
+            nearTiles ??
+            (atlasKind === 'mobile' ? NEAR_TILES_MOBILE : NEAR_TILES_DESKTOP)
+          }
+          drive={drive}
+          poseFor={nearTilePose}
+        />
       </group>
     </group>
   )
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ *  PICKING — which photograph is under the pointer
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * The vertex shader puts every tile where it is. Nothing in the scene graph
+ * knows: the instance matrices are identity, the geometry is a flat unit quad,
+ * and `frustumCulled` is off because even the bounds would be a lie. So
+ * three.js's own raycast against this mesh returns nonsense, and the hit test
+ * has to be done in the same coordinates the shader works in.
+ *
+ * Which is four steps, and no rasterisation:
+ *
+ *   1. Unproject the pointer to a world-space ray.
+ *   2. Rotate the whole ray into the sphere's own frame, undoing the live tilt
+ *      and spin. Both are read from the scene graph at the moment of the call,
+ *      so this is correct while the sphere is turning.
+ *   3. Intersect it with the shell and take the *near* root, so the answer is
+ *      always a photograph on the side of the globe facing the viewer. The
+ *      shell is not one sphere: {@link RELIEF} gives every tile its own radius,
+ *      so a coarse pass against {@link SPHERE_RADIUS} narrows the field and each
+ *      surviving tile is then intersected at the radius it is actually drawn at.
+ *      Skipping that second pass costs a couple of milliradians of error — a few
+ *      pixels at full zoom, and enough to misread a click near a tile's edge.
+ *   4. Invert the gnomonic patch the shader draws: for each tile, express the
+ *      hit direction in that tile's tangent frame and ask whether it falls
+ *      inside the tile's own angular extent. That is the exact inverse of the
+ *      mapping in shaders.ts, so the region that answers "yes" is precisely the
+ *      quad that was drawn — joints between photographs included, which is why
+ *      a click on the grout correctly returns null.
+ *
+ * Usage — framework-agnostic, no React, no r3f:
+ *
+ *   import { pickPhotoAt } from './components/Sphere'
+ *
+ *   element.addEventListener('click', (event) => {
+ *     const hit = pickPhotoAt(event.clientX, event.clientY)
+ *     if (hit) openLightbox(hit.index)      // index into PHOTOS
+ *   })
+ */
+
+type SphereHandle = {
+  placement: Placement
+  radius: number
+  relief: number
+  spin: RefObject<THREE.Group | null>
+  camera: THREE.Camera
+  canvas: HTMLCanvasElement
+}
+
+/** The mounted sphere, or null. One at a time; the last to mount wins. */
+let liveSphere: SphereHandle | null = null
+
+export type PhotoPick = {
+  /** The photograph under the pointer. */
+  photo: Photo
+  /**
+   * Its index in the array the sphere was given — i.e. in `PHOTOS`, the
+   * manifest order. This is the one to hand a lightbox.
+   */
+  index: number
+  /**
+   * Its instance index on the shell, in placement (tonal) order. Only useful
+   * for talking to the sphere itself; it is *not* an index into `PHOTOS`.
+   */
+  tile: number
+  /** Where in the photograph the pointer landed: 0,0 top-left, 1,1 bottom-right. */
+  u: number
+  v: number
+}
+
+const pickRaycaster = new THREE.Raycaster()
+const pickPointer = new THREE.Vector2()
+const pickInverse = new THREE.Matrix4()
+const pickOrigin = new THREE.Vector3()
+const pickDirection = new THREE.Vector3()
+const pickCoarse = new THREE.Vector3()
+const pickLocal = new THREE.Vector3()
+const pickCenter = new THREE.Vector3()
+const pickRefAxis = new THREE.Vector3()
+const pickTangent = new THREE.Vector3()
+const pickBitangent = new THREE.Vector3()
+const pickE1 = new THREE.Vector3()
+const pickE2 = new THREE.Vector3()
+
+/**
+ * Slack on the coarse rejection, radians.
+ *
+ * The first pass finds the hit on a shell of mean radius; the exact one is on
+ * each tile's own, up to {@link RELIEF} away. That moves the hit direction by
+ * almost nothing head-on and by up to √(2·relief) ≈ 0.08 rad where the ray
+ * grazes the limb, so the coarse cap has to be widened by about that much or a
+ * tile at the rim could be rejected before it was ever tested properly.
+ */
+const PICK_COARSE_SLACK = 0.09
+
+/**
+ * The photograph under a pointer position, in client (viewport) coordinates —
+ * i.e. straight from a PointerEvent's `clientX`/`clientY`.
+ *
+ * Returns null when the sphere is not mounted, when the pointer is outside the
+ * canvas, when the ray misses the shell entirely, and when it lands on a joint
+ * between two photographs. Works at any zoom and while the sphere is spinning:
+ * the orientation is read from the scene graph on every call.
+ *
+ * Cheap enough to call on `pointermove` — one ray, 162 dot products, and the
+ * full test on the handful of tiles that survive it. Nothing is allocated.
+ */
+export function pickPhotoAt(clientX: number, clientY: number): PhotoPick | null {
+  const live = liveSphere
+  if (!live) return null
+  const spin = live.spin.current
+  if (!spin) return null
+
+  const rect = live.canvas.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) return null
+  const nx = (clientX - rect.left) / rect.width
+  const ny = (clientY - rect.top) / rect.height
+  if (nx < 0 || nx > 1 || ny < 0 || ny > 1) return null
+
+  // The camera moves in useFrame, so its world matrix can be a frame behind the
+  // value that was actually rendered. Bring both it and the sphere up to date.
+  live.camera.updateMatrixWorld()
+  spin.updateWorldMatrix(true, false)
+
+  pickPointer.set(nx * 2 - 1, 1 - ny * 2)
+  pickRaycaster.setFromCamera(pickPointer, live.camera)
+
+  // Take the ray into the sphere's frame once, rather than taking every hit
+  // point back out of it. The groups only ever rotate, so the direction stays
+  // a unit vector and the intersection maths below is unchanged.
+  pickInverse.copy(spin.matrixWorld).invert()
+  pickOrigin.copy(pickRaycaster.ray.origin).applyMatrix4(pickInverse)
+  pickDirection
+    .copy(pickRaycaster.ray.origin)
+    .add(pickRaycaster.ray.direction)
+    .applyMatrix4(pickInverse)
+    .sub(pickOrigin)
+    .normalize()
+
+  // |origin + t·direction|² = r², with direction normalised.
+  const half = pickOrigin.dot(pickDirection)
+  const square = pickOrigin.dot(pickOrigin)
+  const meanRadius = live.radius
+  const coarseDisc = half * half - (square - meanRadius * meanRadius)
+  if (coarseDisc <= 0) return null
+  const coarseT = -half - Math.sqrt(coarseDisc)
+  if (coarseT <= 0) return null
+  pickCoarse.copy(pickDirection).multiplyScalar(coarseT).add(pickOrigin).normalize()
+
+  const { placed, source, layout } = live.placement
+  const { centers, sizes, rotations, seeds, count } = layout
+
+  let bestTile = -1
+  // Depth, not facing: where two tiles genuinely overlap, the one the ray
+  // reaches first is the one that was drawn on top.
+  let bestDepth = Number.POSITIVE_INFINITY
+  let bestU = 0
+  let bestV = 0
+
+  for (let i = 0; i < count; i++) {
+    pickCenter
+      .set(centers[i * 3], centers[i * 3 + 1], centers[i * 3 + 2])
+      .normalize()
+    const coarseAlong = pickCoarse.dot(pickCenter)
+    if (coarseAlong <= 0) continue
+
+    const halfU = sizes[i * 2]
+    const halfV = sizes[i * 2 + 1]
+    // Cheap reject against the cap that circumscribes the tile. hypot of the
+    // two half-extents over-estimates the corner's angle from the centre for
+    // every extent this layout produces; the slack covers the relief.
+    const cap = Math.min(1.5, Math.hypot(halfU, halfV) + PICK_COARSE_SLACK)
+    if (coarseAlong < Math.cos(cap)) continue
+
+    // This tile's own radius — the shader's `tileRadius`, to the decimal.
+    const radius = meanRadius * (1 + live.relief * (seeds[i] * 2 - 1))
+    const disc = half * half - (square - radius * radius)
+    if (disc <= 0) continue
+    const t = -half - Math.sqrt(disc)
+    if (t <= 0 || t >= bestDepth) continue
+    pickLocal.copy(pickDirection).multiplyScalar(t).add(pickOrigin).normalize()
+
+    const along = pickLocal.dot(pickCenter)
+    if (along <= 0) continue
+
+    // The shader's tangent frame, to the letter — including the pole guard.
+    const polar = Math.abs(pickCenter.y) > 0.99
+    pickRefAxis.set(polar ? 1 : 0, polar ? 0 : 1, 0)
+    pickTangent.copy(pickRefAxis).cross(pickCenter).normalize()
+    pickBitangent.copy(pickCenter).cross(pickTangent)
+
+    const roll = rotations[i]
+    const ca = Math.cos(roll)
+    const sa = Math.sin(roll)
+    pickE1.copy(pickTangent).multiplyScalar(ca).addScaledVector(pickBitangent, sa)
+    pickE2.copy(pickTangent).multiplyScalar(-sa).addScaledVector(pickBitangent, ca)
+
+    // Inverse of the gnomonic patch: the shader draws
+    // normalize(c + e1·tan θ + e2·tan φ), so θ and φ come straight back out as
+    // the arctangents of the hit's components in that frame.
+    const theta = Math.atan2(pickLocal.dot(pickE1), along)
+    const phi = Math.atan2(pickLocal.dot(pickE2), along)
+    if (Math.abs(theta) > halfU || Math.abs(phi) > halfV) continue
+
+    bestDepth = t
+    bestTile = i
+    bestU = theta / (2 * halfU) + 0.5
+    bestV = 0.5 - phi / (2 * halfV)
+  }
+
+  if (bestTile < 0) return null
+  return {
+    photo: placed[bestTile],
+    index: source[bestTile],
+    tile: bestTile,
+    u: bestU,
+    v: bestV,
+  }
 }
