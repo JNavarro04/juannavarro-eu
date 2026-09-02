@@ -113,6 +113,19 @@ export const MAX_STOP_DISTANCE = 3.1
 /** Fraction of the zoom after which the ambient spin has fully stopped. */
 export const SPIN_FADE_END = 0.8
 
+/**
+ * Fraction of the ambient spin the CYLINDER keeps, once the globe has opened.
+ *
+ * The showcase should not be a wall of static photographs — it drifts on its
+ * own so there is always something arriving. It is deliberately slower than the
+ * globe: at 0.4 a photograph takes roughly nine seconds to advance one place,
+ * which reads as alive rather than as a carousel demanding to be watched.
+ *
+ * A visitor's drag composes on top of this rather than replacing it: the drift
+ * lives in `spinScale`, the drag in `spin`, and PhotoSphere adds the two.
+ */
+export const RING_DRIFT = 0.4
+
 /** Fraction of the zoom after which the landing text is gone. */
 export const TEXT_FADE_END = 0.22
 
@@ -409,7 +422,10 @@ export function frameForProgress(
       clamp(orbit.latitude, -ORBIT_LATITUDE_LIMIT, ORBIT_LATITUDE_LIMIT) * (1 - flatten) +
       (reducedMotion ? 0 : ARC_LIFT * Math.sin(Math.PI * eased)),
     // Unprompted motion, and the only motion here nobody asked for: off.
-    spinScale: reducedMotion ? 0 : 1 - smootherstep(p / SPIN_FADE_END),
+    // Eases to RING_DRIFT rather than to zero, so the showcase keeps turning.
+    spinScale: reducedMotion
+      ? 0
+      : 1 - (1 - RING_DRIFT) * smootherstep(p / SPIN_FADE_END),
     textOpacity: 1 - smootherstep(p / TEXT_FADE_END),
     flatten,
   }
