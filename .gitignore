@@ -21,3 +21,8 @@ photos-src/
 *-lab.html
 *-lab.ts
 *-check.html
+
+# graphify code graph — regenerated in seconds at zero token cost with
+# `graphify update .`, so it is rebuilt rather than tracked. Un-ignore it if you
+# want a clone to arrive with the graph already built.
+graphify-out/
