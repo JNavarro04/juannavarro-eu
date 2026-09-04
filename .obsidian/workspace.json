@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "563cc809cd95a99a",
+        "id": "7935a2ab6be43126",
         "type": "tabs",
         "children": [
           {
-            "id": "71fe2962af2fb894",
+            "id": "731360c6ed18ab05",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -181,8 +181,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "71fe2962af2fb894",
+  "active": "731360c6ed18ab05",
   "lastOpenFiles": [
+    "SETUP.md",
     "CLAUDE.md",
     "notes/Gotchas.md",
     "notes/Contact and Deploy.md",

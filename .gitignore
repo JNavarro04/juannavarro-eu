@@ -30,3 +30,5 @@ graphify-out/
 # Obsidian: keep the vault config, drop the per-machine UI state
 .obsidian/workspace*
 .obsidian/cache
+notes/.obsidian/workspace*
+notes/.obsidian/cache
