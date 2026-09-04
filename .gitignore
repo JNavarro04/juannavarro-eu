@@ -26,3 +26,7 @@ photos-src/
 # `graphify update .`, so it is rebuilt rather than tracked. Un-ignore it if you
 # want a clone to arrive with the graph already built.
 graphify-out/
+
+# Obsidian: keep the vault config, drop the per-machine UI state
+.obsidian/workspace*
+.obsidian/cache

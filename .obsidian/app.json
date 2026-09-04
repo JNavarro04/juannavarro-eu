@@ -1,1 +1,10 @@
-{}
+{
+  "userIgnoreFilters": [
+    "node_modules/",
+    "dist/",
+    "graphify-out/",
+    "photos-src/",
+    "public/",
+    ".claude/"
+  ]
+}
